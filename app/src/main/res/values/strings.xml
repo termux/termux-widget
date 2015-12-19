@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Termux:Widget</string>
+    <string name="shortcut_widget_name">All shortcuts</string>
+    <string name="single_shortcut_name">Single shortcut</string>
+    <string name="no_shortcut_scripts">No files in\n$HOME/.shortcuts/</string>
+    <string name="refresh">Refresh</string>
+    <string name="termux">Termux</string>
+    <string name="scripts_reloaded">Termux shortcuts reloaded</string>
+    <string name="bad_token_message">This shortcut has become invalid - remove and add again.</string>
+
+</resources>

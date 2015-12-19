@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="0dp" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="0dp"
+        android:paddingTop="6dp" >
+
+        <LinearLayout
+            android:id="@+id/top_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FF000000"
+            android:orientation="horizontal"
+            android:padding="6dp" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="2.0"
+                android:text="@string/termux"
+                android:textColor="@android:color/primary_text_dark"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/widget_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/top_row"
+            android:background="@android:color/background_light"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="1px" >
+        </ListView>
+
+        <!-- Shown for empty collection due to rv.setEmptyView(R.id.widget_list, R.id.empty_view) being called: -->
+
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/top_row"
+            android:background="@android:color/white"
+            android:padding="6dp"
+            android:text="@string/no_shortcut_scripts"
+            android:textColor="@android:color/black" />
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/refresh_button"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/refresh"
+        android:tint="#99000000"
+        android:src="@android:drawable/stat_notify_sync" />
+
+</RelativeLayout>

@@ -1,0 +1,13 @@
+<!--
+	See
+	http://developer.android.com/guide/practices/ui_guidelines/widget_design.html#anatomy_determining_size
+	for how to determine size: 
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:initialLayout="@layout/widget_layout"
+    android:minHeight="110dp"
+    android:minWidth="110dp"
+    android:previewImage="@drawable/widgetpreview"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen|keyguard" />
