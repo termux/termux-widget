@@ -84,10 +84,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 		case LIST_ITEM_CLICKED_ACTION:
 			String clickedFilePath = intent.getStringExtra(EXTRA_CLICKED_FILE);
 			File clickedFile = new File(clickedFilePath);
-			if (!clickedFile.canExecute()) {
-				// Cover for the user if he forgot to mark the file executable:
-				clickedFile.setExecutable(true);
-			}
+			ensureFileReadableAndExecutable(clickedFile);
 			Uri scriptUri = new Uri.Builder().scheme("file").path(clickedFilePath).build();
 
 			// Note: Must match TermuxService#ACTION_EXECUTE constant:
@@ -104,6 +101,12 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 			toast.show();
 			break;
 		}
+	}
+
+	/** Ensure readable and executable file if user forgot to do so. */
+	static void ensureFileReadableAndExecutable(File file) {
+		if (!file.canRead()) file.setReadable(true);
+		if (!file.canExecute()) file.setExecutable(true);
 	}
 
 }

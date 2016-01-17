@@ -42,10 +42,7 @@ public class TermuxLaunchShortcutActivity extends Activity {
 		}
 
 		File clickedFile = new File(intent.getData().getPath());
-		if (!clickedFile.canExecute()) {
-			// Cover for the user if he forgot to mark the file executable:
-			clickedFile.setExecutable(true);
-		}
+		TermuxWidgetProvider.ensureFileReadableAndExecutable(clickedFile);
 
 		Intent executeIntent = new Intent(TermuxWidgetProvider.ACTION_EXECUTE, getIntent().getData());
 		executeIntent.setClassName("com.termux", TermuxWidgetProvider.TERMUX_SERVICE);
