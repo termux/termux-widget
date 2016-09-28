@@ -17,7 +17,7 @@ import java.io.FileFilter;
 
 public class TermuxCreateShortcutActivity extends Activity {
 
-	ListView mListView ;
+	private ListView mListView ;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +52,7 @@ public class TermuxCreateShortcutActivity extends Activity {
 		final String[] values = new String[files.length];
 		for (int i = 0; i < values.length; i++) values[i] = files[i].getName();
 
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, values);
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, values);
 		mListView.setAdapter(adapter);
 
 		mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

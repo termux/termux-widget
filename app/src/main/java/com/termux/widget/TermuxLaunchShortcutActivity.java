@@ -23,7 +23,7 @@ public class TermuxLaunchShortcutActivity extends Activity {
 		String token = prefs.getString("token", null);
 		if (token == null) {
 			token = UUID.randomUUID().toString();
-			prefs.edit().putString("token", token).commit();
+			prefs.edit().putString("token", token).apply();
 		}
 		return token;
 	}

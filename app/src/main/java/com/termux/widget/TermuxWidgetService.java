@@ -15,6 +15,7 @@ import android.widget.RemoteViewsService;
 
 public final class TermuxWidgetService extends RemoteViewsService {
 
+	@SuppressLint("SdCardPath")
 	public static final File SHORTCUTS_DIR = new File("/data/data/com.termux/files/home/.shortcuts");
 
 	public static final class TermuxWidgetItem {
