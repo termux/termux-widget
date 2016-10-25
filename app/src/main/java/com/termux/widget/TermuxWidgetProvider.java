@@ -84,8 +84,9 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 		case LIST_ITEM_CLICKED_ACTION:
 			String clickedFilePath = intent.getStringExtra(EXTRA_CLICKED_FILE);
 			File clickedFile = new File(clickedFilePath);
+			if (clickedFile.isDirectory()) return;
 			ensureFileReadableAndExecutable(clickedFile);
-			Uri scriptUri = new Uri.Builder().scheme("file").path(clickedFilePath).build();
+			Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(clickedFilePath).build();
 
 			// Note: Must match TermuxService#ACTION_EXECUTE constant:
 			Intent executeIntent = new Intent(ACTION_EXECUTE, scriptUri);
