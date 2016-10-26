@@ -64,7 +64,7 @@ public class TermuxCreateShortcutActivity extends Activity {
 
 				Intent.ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(context, R.drawable.ic_launcher);
 
-				Uri scriptUri = new Uri.Builder().scheme("file").path(clickedFile.getAbsolutePath()).build();
+				Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(clickedFile.getAbsolutePath()).build();
 				Intent executeIntent = new Intent(context, TermuxLaunchShortcutActivity.class);
 				executeIntent.setData(scriptUri);
 				executeIntent.putExtra(TermuxLaunchShortcutActivity.TOKEN_NAME, TermuxLaunchShortcutActivity.getGeneratedToken(context));
