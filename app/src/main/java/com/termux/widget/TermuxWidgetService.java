@@ -26,9 +26,8 @@ public final class TermuxWidgetService extends RemoteViewsService {
         public final String mFile;
 
         public TermuxWidgetItem(File file, int depth) {
-            this.mLabel = (depth == 0 ? "" : String.format("%" + depth * 2 + "s", ""))
-                    + file.getName().replace('-', ' ')
-                    + (file.isDirectory() ? ":" : "");
+            this.mLabel = (depth > 0 ? (file.getParentFile().getName() + "/") : "")
+                    + file.getName().replace('-', ' ');
             this.mFile = file.getAbsolutePath();
         }
 
@@ -147,9 +146,10 @@ public final class TermuxWidgetService extends RemoteViewsService {
         });
 
         for (File file : files) {
-            widgetItems.add(new TermuxWidgetItem(file, depth));
             if (file.isDirectory()) {
                 addFile(file, widgetItems, depth + 1);
+            } else {
+                widgetItems.add(new TermuxWidgetItem(file, depth));
             }
         }
 
