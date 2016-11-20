@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import java.io.File;
@@ -51,6 +52,15 @@ public class TermuxLaunchShortcutActivity extends Activity {
 
 		Intent executeIntent = new Intent(TermuxWidgetProvider.ACTION_EXECUTE, scriptUri);
 		executeIntent.setClassName("com.termux", TermuxWidgetProvider.TERMUX_SERVICE);
+		if (clickedFile.getParentFile().getName().equals("tasks")) {
+			executeIntent.putExtra("com.termux.execute.background", true);
+			// Show feedback for executed background task.
+			String message = "Task executed: " + clickedFile.getName();
+			Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+		}
+
 		startService(executeIntent);
 		finish();
 	}
