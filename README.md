@@ -2,7 +2,7 @@ Termux:Widget
 -------------
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-Add-on app which adds shortcuts to scripts and commands on the home screen.
+A [Termux](https://termux.com) add-on app which adds shortcuts to commands on the home screen.
 
 - [Termux:Widget on Google Play](https://play.google.com/store/apps/details?id=com.termux.widget)
 
