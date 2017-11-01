@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.view.Gravity;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -99,7 +100,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                 }
-                context.startService(executeIntent);
+                startTermuxService(context, executeIntent);
                 break;
             case REFRESH_WIDGET_ACTION:
                 int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -110,6 +111,16 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
                 toast.show();
                 break;
         }
+    }
+
+    static void startTermuxService(Context context, Intent executeIntent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // https://developer.android.com/about/versions/oreo/background.html
+            context.startForegroundService(executeIntent);
+        } else {
+            context.startService(executeIntent);
+        }
+
     }
 
     /** Ensure readable and executable file if user forgot to do so. */

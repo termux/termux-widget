@@ -61,7 +61,7 @@ public class TermuxLaunchShortcutActivity extends Activity {
 			toast.show();
 		}
 
-		startService(executeIntent);
+		TermuxWidgetProvider.startTermuxService(this, executeIntent);
 		finish();
 	}
 
