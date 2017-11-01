@@ -28,7 +28,7 @@ public class TermuxCreateShortcutActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shortcuts_listview);
-        mListView = (ListView) findViewById(R.id.list);
+        mListView = findViewById(R.id.list);
     }
 
     @Override
