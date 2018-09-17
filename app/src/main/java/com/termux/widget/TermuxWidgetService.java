@@ -7,10 +7,8 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public final class TermuxWidgetService extends RemoteViewsService {
@@ -127,22 +125,14 @@ public final class TermuxWidgetService extends RemoteViewsService {
     private static void addFile(File dir, List<TermuxWidgetItem> widgetItems, int depth) {
         if (depth > 5) return;
 
-        File[] files = dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return !pathname.getName().startsWith(".");
-            }
-        });
+        File[] files = dir.listFiles(pathname -> !pathname.getName().startsWith("."));
 
         if (files == null) return;
-        Arrays.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File lhs, File rhs) {
-                if (lhs.isDirectory() != rhs.isDirectory()) {
-                    return lhs.isDirectory() ? 1 : -1;
-                }
-                return lhs.getName().compareToIgnoreCase(rhs.getName());
+        Arrays.sort(files, (lhs, rhs) -> {
+            if (lhs.isDirectory() != rhs.isDirectory()) {
+                return lhs.isDirectory() ? 1 : -1;
             }
+            return lhs.getName().compareToIgnoreCase(rhs.getName());
         });
 
         for (File file : files) {

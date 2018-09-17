@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Termux:Widget</string>
     <string name="shortcut_widget_name">All shortcuts</string>

@@ -64,5 +64,4 @@ public class TermuxLaunchShortcutActivity extends Activity {
 		TermuxWidgetProvider.startTermuxService(this, executeIntent);
 		finish();
 	}
-
 }
