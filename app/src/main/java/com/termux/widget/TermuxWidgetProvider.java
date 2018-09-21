@@ -120,7 +120,6 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         } else {
             context.startService(executeIntent);
         }
-
     }
 
     /** Ensure readable and executable file if user forgot to do so. */
@@ -128,5 +127,4 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         if (!file.canRead()) file.setReadable(true);
         if (!file.canExecute()) file.setExecutable(true);
     }
-
 }

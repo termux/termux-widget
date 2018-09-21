@@ -1,9 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="com.termux.widget"
-          android:sharedUserId="com.termux">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.termux.widget"
+    android:sharedUserId="com.termux">
 
-    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
 
     <application
         android:allowBackup="false"
@@ -23,13 +26,19 @@
                 android:resource="@xml/termux_appwidget_info" />
         </receiver>
 
-        <activity android:name=".TermuxCreateShortcutActivity" android:label="@string/single_shortcut_name">
+        <activity
+            android:name=".TermuxCreateShortcutActivity"
+            android:label="@string/single_shortcut_name">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".TermuxLaunchShortcutActivity" android:noHistory="true" android:theme="@android:style/Theme.NoDisplay" android:exported="true"/>
+        <activity
+            android:name=".TermuxLaunchShortcutActivity"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:exported="true"/>
 
         <service
             android:name=".TermuxWidgetService"
