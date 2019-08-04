@@ -97,7 +97,10 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
                     // Show feedback for executed background task.
                     String message = "Task executed: " + clickedFile.getName();
                     Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    // Put the toast at the top of the screen, to avoid blocking eventual
+                    // toasts made from the task with termux-toast.
+                    // See https://github.com/termux/termux-widget/issues/33
+                    toast.setGravity(Gravity.TOP, 0, 0);
                     toast.show();
                 }
                 startTermuxService(context, executeIntent);
