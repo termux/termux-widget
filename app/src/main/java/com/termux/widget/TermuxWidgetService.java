@@ -132,7 +132,7 @@ public final class TermuxWidgetService extends RemoteViewsService {
             if (lhs.isDirectory() != rhs.isDirectory()) {
                 return lhs.isDirectory() ? 1 : -1;
             }
-            return lhs.getName().compareToIgnoreCase(rhs.getName());
+            return NaturalOrderComparator.compare(lhs.getName(), rhs.getName());
         });
 
         for (File file : files) {
