@@ -1,11 +1,17 @@
 ---
 name: Feature request
-about: Suggest a new feature in termux-widget
+about: Suggest a new feature for Termux:Widget application
 
 ---
 
-**Feature description**
-Describe the feature and why you want it.
+<!--
+IMPORTANT:
 
-**Background information**
-Do you know of other apps that has a similar feature as the one you want? (Provide links)
+1. Support of Android 5.x - 6.x is finished.
+2. Fill the template AFTER comments.
+-->
+
+**Feature description**
+<!--
+Describe the feature and why you want it.
+-->
