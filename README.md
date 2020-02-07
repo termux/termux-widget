@@ -1,6 +1,6 @@
 # Termux:Widget
 
-[![Build status](https://api.cirrus-ci.com/github/termux/termux-widget.svg?branch=master)](https://cirrus-ci.com/termux/termux-widget)
+[![Build status](https://github.com/termux/termux-widget/workflows/Build/badge.svg)](https://github.com/termux/termux-widget/actions)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
 A [Termux](https://termux.com) add-on app adding shortcuts to commands on the
