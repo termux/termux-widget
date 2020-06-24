@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -50,7 +52,14 @@ public class TermuxCreateShortcutActivity extends Activity {
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, executeIntent);
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, clickedFile.getName());
-            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
+
+            File scriptIcon = new File(TermuxWidgetService.SHORTCUTS_DIR.getAbsolutePath() + "/icons/" + clickedFile.getName() + ".png");
+            if (scriptIcon.exists()) {
+                BitmapDrawable bitmapDrawable = (BitmapDrawable)Drawable.createFromPath(scriptIcon.getAbsolutePath());
+                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, bitmapDrawable.getBitmap());
+            } else {
+                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
+            }
 
             setResult(RESULT_OK, intent);
             finish();
