@@ -3,6 +3,8 @@ package com.termux.widget;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -14,7 +16,7 @@ import java.util.List;
 public final class TermuxWidgetService extends RemoteViewsService {
 
     @SuppressLint("SdCardPath")
-    public static final File SHORTCUTS_DIR = new File("/data/data/com.termux/files/home/.shortcuts");
+    public static File SHORTCUTS_DIR = new File("/data/data/com.termux/files/home/.shortcuts");
 
     public static final class TermuxWidgetItem {
 
@@ -29,6 +31,22 @@ public final class TermuxWidgetService extends RemoteViewsService {
             this.mFile = file.getAbsolutePath();
         }
 
+    }
+
+    @Override
+    public void onCreate() {
+        File[] strg = getApplicationContext().getExternalFilesDirs(null);
+        if (strg.length > 0) {
+            File dest = strg[0];
+            for (File f:strg) {
+                if (Environment.isExternalStorageRemovable(f)) {
+                    dest = f;
+                    break;
+                }
+            }
+            Log.i("termux", "new sh path " + dest.getAbsolutePath() + "/.shortcuts");
+            SHORTCUTS_DIR = new File(dest.getAbsolutePath() + "/.shortcuts");
+        }
     }
 
     @Override
