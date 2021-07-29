@@ -35,6 +35,15 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            if (variant.buildType.name == "debug") {
+                def releaseTag = System.getenv("RELEASE_TAG")
+                outputFileName = new File("termux-widget" + (releaseTag ? "-" + releaseTag : "") + "-debug.apk")
+            }
+        }
+    }
 }
 
 task versionName {
