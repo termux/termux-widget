@@ -7,6 +7,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +15,20 @@ import java.util.List;
 public final class TermuxWidgetService extends RemoteViewsService {
 
     @SuppressLint("SdCardPath")
-    public static final File SHORTCUTS_DIR = new File("/data/data/com.termux/files/home/.shortcuts");
+    public static final String SHORTCUTS_DIR_PATH = "/data/data/com.termux/files/home/.shortcuts";
+    public static final File SHORTCUTS_DIR = new File(SHORTCUTS_DIR_PATH);
+
+    public static final String SHORTCUT_ICONS_DIR_BASENAME ="icons";
+
+    public static final FileFilter SHORTCUT_FILES_FILTER = new FileFilter() {
+        public boolean accept(File file) {
+            if (file.getName().startsWith("."))
+                return false;
+            else if (SHORTCUTS_DIR.equals(file.getParentFile()) && file.getName().equals(SHORTCUT_ICONS_DIR_BASENAME))
+                return false;
+            return true;
+        }
+    };
 
     public static final class TermuxWidgetItem {
 
@@ -125,7 +139,7 @@ public final class TermuxWidgetService extends RemoteViewsService {
     private static void addFile(File dir, List<TermuxWidgetItem> widgetItems, int depth) {
         if (depth > 5) return;
 
-        File[] files = dir.listFiles(pathname -> !pathname.getName().startsWith("."));
+        File[] files = dir.listFiles(TermuxWidgetService.SHORTCUT_FILES_FILTER);
 
         if (files == null) return;
         Arrays.sort(files, (lhs, rhs) -> {

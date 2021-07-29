@@ -53,7 +53,8 @@ public class TermuxCreateShortcutActivity extends Activity {
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, executeIntent);
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, clickedFile.getName());
 
-            File scriptIcon = new File(TermuxWidgetService.SHORTCUTS_DIR.getAbsolutePath() + "/icons/" + clickedFile.getName() + ".png");
+            File scriptIcon = new File(TermuxWidgetService.SHORTCUTS_DIR_PATH + "/" +
+                    TermuxWidgetService.SHORTCUT_ICONS_DIR_BASENAME + "/" + clickedFile.getName() + ".png");
             if (scriptIcon.exists()) {
                 BitmapDrawable bitmapDrawable = (BitmapDrawable)Drawable.createFromPath(scriptIcon.getAbsolutePath());
                 intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, bitmapDrawable.getBitmap());
@@ -68,7 +69,8 @@ public class TermuxCreateShortcutActivity extends Activity {
 
     private void updateListview(File directory) {
         mCurrentDirectory = directory;
-        mCurrentFiles = directory.listFiles(pathname -> !pathname.getName().startsWith("."));
+        mCurrentFiles = directory.listFiles(TermuxWidgetService.SHORTCUT_FILES_FILTER);
+
         if (mCurrentFiles == null) mCurrentFiles = new File[0];
 
         Arrays.sort(mCurrentFiles, (f1, f2) -> f1.getName().compareTo(f2.getName()));
