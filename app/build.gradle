@@ -6,8 +6,8 @@ android {
         applicationId "com.termux.widget"
         minSdkVersion project.properties.minSdkVersion.toInteger()
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
-        versionCode 11
-        versionName "0.11"
+        versionCode 12
+        versionName "0.12"
     }
 
     signingConfigs {
