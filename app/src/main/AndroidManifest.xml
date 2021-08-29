@@ -43,6 +43,16 @@
             android:name=".TermuxWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".TermuxWidgetControlsProviderService"
+            android:label="Termux Shortcuts"
+            android:permission="android.permission.BIND_CONTROLS">
+            <intent-filter>
+                <action android:name="android.service.controls.ControlsProviderService" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
