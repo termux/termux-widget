@@ -47,7 +47,7 @@
 
         <service
             android:name=".TermuxWidgetControlsProviderService"
-            android:label="Termux Shortcuts"
+            android:label="@string/termux_shortcuts"
             android:permission="android.permission.BIND_CONTROLS">
             <intent-filter>
                 <action android:name="android.service.controls.ControlsProviderService" />
