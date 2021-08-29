@@ -9,7 +9,10 @@ import android.os.Build;
 import android.service.controls.Control;
 import android.service.controls.ControlsProviderService;
 import android.service.controls.DeviceTypes;
+import android.service.controls.actions.CommandAction;
 import android.service.controls.actions.ControlAction;
+import android.service.controls.templates.ControlTemplate;
+import android.service.controls.templates.StatelessTemplate;
 
 import org.reactivestreams.FlowAdapters;
 
@@ -34,6 +37,7 @@ import static com.termux.widget.TermuxLaunchShortcutActivity.TOKEN_NAME;
 @TargetApi(Build.VERSION_CODES.R)
 public class TermuxWidgetControlsProviderService extends ControlsProviderService {
     private static final int WIDGET_REQUEST_CODE = 2233;
+    private static final String STATELESS_TEMPLATE_ID = "2";
 
     private final ReplayProcessor<Control> mReplayProcessor = ReplayProcessor.create();
 
@@ -88,6 +92,20 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
         // our controls have no custom UI interaction, they only fire a command so
         // we just need to notify consumer that we have handled successfully
         consumer.accept(ControlAction.RESPONSE_OK);
+
+        if (controlAction instanceof CommandAction) {
+            performWidgetCommandAction(controlId);
+        }
+    }
+
+    private void performWidgetCommandAction(String filePath) {
+        File file = new File(filePath);
+        if (file.isFile() && file.exists()) {
+            // run via BroadcastReceiver instead of Activity so we don't have
+            // the BottomSheet briefly appearing
+            Intent intent = createBroadcastIntentForShortcutFile(file);
+            sendBroadcast(intent);
+        }
     }
 
     /**
@@ -131,12 +149,13 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
      * @return Control
      */
     private Control createWidgetControlForValidShortcutFile(File shortcutFile) {
-        PendingIntent pendingIntent = createPendingIntentForShortcutFile(shortcutFile);
+        PendingIntent pendingIntent = createNoopPendingIntent();
 
         return new Control.StatefulBuilder(shortcutFile.getAbsolutePath(), pendingIntent)
                 .setTitle(shortcutFile.getName())
                 .setSubtitle(createSubtitle(shortcutFile))
                 .setCustomIcon(createDefaultIcon())
+                .setControlTemplate(createDefaultStatelessTemplate())
                 .setDeviceType(DeviceTypes.TYPE_UNKNOWN)
                 .setStatus(Control.STATUS_OK)
                 .build();
@@ -159,6 +178,10 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
         return Icon.createWithResource(getBaseContext(), R.drawable.ic_launcher);
     }
 
+    private ControlTemplate createDefaultStatelessTemplate() {
+        return new StatelessTemplate(STATELESS_TEMPLATE_ID);
+    }
+
     /**
      * Create PendingIntent that does nothing, but is required for Control builder as
      * we cannot pass null there.
@@ -177,13 +200,24 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
     private PendingIntent createPendingIntentForShortcutFile(File file) {
         Intent intent = new Intent(getBaseContext(), TermuxLaunchShortcutActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        addShortcutFileExtrasToIntent(file, intent);
 
+        return PendingIntent.getActivity(getBaseContext(), WIDGET_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private Intent addShortcutFileExtrasToIntent(File file, Intent intent) {
         String token = TermuxLaunchShortcutActivity.getGeneratedToken(getBaseContext());
         intent.putExtra(TOKEN_NAME, token);
 
         Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(file.getAbsolutePath()).build();
         intent.setData(scriptUri);
-        return PendingIntent.getActivity(getBaseContext(), WIDGET_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return intent;
+    }
+
+    private Intent createBroadcastIntentForShortcutFile(File file) {
+        Intent intent = new Intent(getBaseContext(), TermuxWidgetControlExecutorReceiver.class);
+        addShortcutFileExtrasToIntent(file, intent);
+        return intent;
     }
 
     /**
