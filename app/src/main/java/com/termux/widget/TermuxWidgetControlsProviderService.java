@@ -205,13 +205,12 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
         return PendingIntent.getActivity(getBaseContext(), WIDGET_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private Intent addShortcutFileExtrasToIntent(File file, Intent intent) {
+    private void addShortcutFileExtrasToIntent(File file, Intent intent) {
         String token = TermuxLaunchShortcutActivity.getGeneratedToken(getBaseContext());
         intent.putExtra(TOKEN_NAME, token);
 
         Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(file.getAbsolutePath()).build();
         intent.setData(scriptUri);
-        return intent;
     }
 
     private Intent createBroadcastIntentForShortcutFile(File file) {
@@ -246,7 +245,7 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
             // max depth defined from TermuxWidgetService so using same here
             return;
         }
-        File[] files = dir.listFiles();
+        File[] files = dir.listFiles(TermuxWidgetService.SHORTCUT_FILES_FILTER);
 
         if (files == null) {
             return;
