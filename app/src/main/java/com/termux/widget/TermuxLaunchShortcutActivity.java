@@ -42,26 +42,7 @@ public class TermuxLaunchShortcutActivity extends Activity {
 			finish();
 			return;
 		}
-
-		File clickedFile = new File(intent.getData().getPath());
-		TermuxWidgetProvider.ensureFileReadableAndExecutable(clickedFile);
-
-		// Do not use the intent data passed in, since that may be an old one with a file:// uri
-		// which is not allowed starting with Android 7.
-		Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(clickedFile.getAbsolutePath()).build();
-
-		Intent executeIntent = new Intent(TermuxWidgetProvider.ACTION_EXECUTE, scriptUri);
-		executeIntent.setClassName("com.termux", TermuxWidgetProvider.TERMUX_SERVICE);
-		if (clickedFile.getParentFile().getName().equals("tasks")) {
-			executeIntent.putExtra("com.termux.execute.background", true);
-			// Show feedback for executed background task.
-			String message = "Task executed: " + clickedFile.getName();
-			Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-			toast.setGravity(Gravity.CENTER, 0, 0);
-			toast.show();
-		}
-
-		TermuxWidgetProvider.startTermuxService(this, executeIntent);
+		TermuxWidgetProvider.handleTermuxShortcutExecuteIntent(this, intent);
 		finish();
 	}
 }

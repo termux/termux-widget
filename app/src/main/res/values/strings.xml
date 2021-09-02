@@ -8,5 +8,6 @@
     <string name="termux">Termux</string>
     <string name="scripts_reloaded">Termux shortcuts reloaded</string>
     <string name="bad_token_message">This shortcut has become invalid - remove and add again.</string>
+    <string name="termux_shortcuts">Termux Shortcuts</string>
 
 </resources>

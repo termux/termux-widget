@@ -116,6 +116,33 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         }
     }
 
+    /**
+     * Helper to extract termux shortcut file and build an executable intent to
+     * run via TermuxService.
+     * @param context
+     * @param intent
+     */
+    static void handleTermuxShortcutExecuteIntent(Context context, Intent intent) {
+        File shortcutFile = new File(intent.getData().getPath());
+        ensureFileReadableAndExecutable(shortcutFile);
+
+        // Do not use the intent data passed in, since that may be an old one with a file:// uri
+        // which is not allowed starting with Android 7.
+        Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(shortcutFile.getAbsolutePath()).build();
+
+        Intent executeIntent = new Intent(TermuxWidgetProvider.ACTION_EXECUTE, scriptUri);
+        executeIntent.setClassName("com.termux", TermuxWidgetProvider.TERMUX_SERVICE);
+        if (shortcutFile.getParentFile() != null && shortcutFile.getParentFile().getName().equals("tasks")) {
+            executeIntent.putExtra("com.termux.execute.background", true);
+            // Show feedback for executed background task.
+            String message = "Task executed: " + shortcutFile.getName();
+            Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+        startTermuxService(context, executeIntent);
+    }
+
     static void startTermuxService(Context context, Intent executeIntent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // https://developer.android.com/about/versions/oreo/background.html
