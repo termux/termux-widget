@@ -11,22 +11,32 @@ import android.view.Gravity;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.termux.shared.data.DataUtils;
+import com.termux.shared.data.IntentUtils;
+import com.termux.shared.file.FileUtils;
+import com.termux.shared.file.TermuxFileUtils;
+import com.termux.shared.file.filesystem.FileType;
+import com.termux.shared.logger.Logger;
+import com.termux.shared.models.ExecutionCommand;
+import com.termux.shared.models.ResultData;
+import com.termux.shared.models.errors.Error;
+import com.termux.shared.settings.preferences.TermuxWidgetAppSharedPreferences;
+import com.termux.shared.shell.ShellUtils;
+import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
+import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET.TERMUX_WIDGET_PROVIDER;
+import com.termux.shared.termux.TermuxUtils;
+
 import java.io.File;
 
 /**
- * Widget providing a list to launch scripts in $HOME/.termux/shortcuts/.
+ * Widget providing a list to launch scripts in ~/.shortcuts/.
  * <p>
  * See https://developer.android.com/guide/topics/appwidgets/index.html
  */
 public final class TermuxWidgetProvider extends AppWidgetProvider {
 
-    private static final String LIST_ITEM_CLICKED_ACTION = "com.termux.widgets.LIST_ITEM_CLICKED_ACTION";
-    private static final String REFRESH_WIDGET_ACTION = "com.termux.widgets.REFRESH_WIDGET_ACTION";
-    public static final String EXTRA_CLICKED_FILE = "com.termux.widgets.EXTRA_CLICKED_FILE";
-
-    public static final String TERMUX_SERVICE = "com.termux.app.TermuxService";
-    public static final String ACTION_EXECUTE = "com.termux.service_execute";
-
+    private static final String LOG_TAG = "TermuxWidgetProvider";
 
     /**
      * "This is called to update the App Widget at intervals defined by the updatePeriodMillis attribute in the
@@ -56,7 +66,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 
             // Setup refresh button:
             Intent refreshIntent = new Intent(context, TermuxWidgetProvider.class);
-            refreshIntent.setAction(TermuxWidgetProvider.REFRESH_WIDGET_ACTION);
+            refreshIntent.setAction(TERMUX_WIDGET_PROVIDER.ACTION_REFRESH_WIDGET);
             refreshIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             refreshIntent.setData(Uri.parse(refreshIntent.toUri(Intent.URI_INTENT_SCHEME)));
             PendingIntent refreshPendingIntent = PendingIntent.getBroadcast(context, 0, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -67,7 +77,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
             // setup a pending intent template, and the individual items can set a fillInIntent
             // to create unique before on an item to item basis.
             Intent toastIntent = new Intent(context, TermuxWidgetProvider.class);
-            toastIntent.setAction(TermuxWidgetProvider.LIST_ITEM_CLICKED_ACTION);
+            toastIntent.setAction(TERMUX_WIDGET_PROVIDER.ACTION_WIDGET_ITEM_CLICKED);
             toastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
             PendingIntent toastPendingIntent = PendingIntent.getBroadcast(context, 0, toastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -82,79 +92,144 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         super.onReceive(context, intent);
 
         switch (intent.getAction()) {
-            case LIST_ITEM_CLICKED_ACTION:
-                String clickedFilePath = intent.getStringExtra(EXTRA_CLICKED_FILE);
-                File clickedFile = new File(clickedFilePath);
-                if (clickedFile.isDirectory()) return;
-                ensureFileReadableAndExecutable(clickedFile);
-                Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(clickedFilePath).build();
-
-                // Note: Must match TermuxService#ACTION_EXECUTE constant:
-                Intent executeIntent = new Intent(ACTION_EXECUTE, scriptUri);
-                executeIntent.setClassName("com.termux", TERMUX_SERVICE);
-                if (clickedFile.getParentFile().getName().equals("tasks")) {
-                    executeIntent.putExtra("com.termux.execute.background", true);
-                    // Show feedback for executed background task.
-                    String message = "Task executed: " + clickedFile.getName();
-                    Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
-                    // Put the toast at the top of the screen, to avoid blocking eventual
-                    // toasts made from the task with termux-toast.
-                    // See https://github.com/termux/termux-widget/issues/33
-                    toast.setGravity(Gravity.TOP, 0, 0);
-                    toast.show();
-                }
-                startTermuxService(context, executeIntent);
+            case TERMUX_WIDGET_PROVIDER.ACTION_WIDGET_ITEM_CLICKED:
+                String clickedFilePath = intent.getStringExtra(TERMUX_WIDGET_PROVIDER.EXTRA_FILE_CLICKED);
+                if (FileUtils.getFileType(clickedFilePath, true) == FileType.DIRECTORY) return;
+                sendExecutionIntentToTermuxService(context, clickedFilePath, LOG_TAG);
                 break;
-            case REFRESH_WIDGET_ACTION:
+            case TERMUX_WIDGET_PROVIDER.ACTION_REFRESH_WIDGET:
                 int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
                 AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
 
-                Toast toast = Toast.makeText(context, R.string.scripts_reloaded, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(context, R.string.msg_scripts_reloaded, Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
                 break;
         }
     }
 
+
+
+
+
+
     /**
-     * Helper to extract termux shortcut file and build an executable intent to
-     * run via TermuxService.
-     * @param context
-     * @param intent
+     * Extract termux shortcut file path from an intent and send intent to TermuxService to execute it.
+     *
+     * @param context The {@link Context} that will be used to send execution intent to the TermuxService.
+     * @param intent The {@link Intent} received for the shortcut file.
      */
-    static void handleTermuxShortcutExecuteIntent(Context context, Intent intent) {
-        File shortcutFile = new File(intent.getData().getPath());
-        ensureFileReadableAndExecutable(shortcutFile);
+    public static void handleTermuxShortcutExecutionIntent(Context context, Intent intent, String logTag) {
+        if (context == null || intent == null) return;
+        logTag = DataUtils.getDefaultIfNull(logTag, LOG_TAG);
+        String token = intent.getStringExtra(TermuxConstants.TERMUX_WIDGET.EXTRA_TOKEN_NAME);
+        if (token == null || !token.equals(TermuxWidgetAppSharedPreferences.getGeneratedToken(context))) {
+            Logger.logWarn(logTag, "Invalid token \"" + token + "\" for intent:\n" + IntentUtils.getIntentString(intent));
+            Toast.makeText(context, R.string.msg_bad_token, Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        // Do not use the intent data passed in, since that may be an old one with a file:// uri
-        // which is not allowed starting with Android 7.
-        Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(shortcutFile.getAbsolutePath()).build();
+        sendExecutionIntentToTermuxService(context, intent.getData().getPath(), logTag);
+    }
 
-        Intent executeIntent = new Intent(TermuxWidgetProvider.ACTION_EXECUTE, scriptUri);
-        executeIntent.setClassName("com.termux", TermuxWidgetProvider.TERMUX_SERVICE);
-        if (shortcutFile.getParentFile() != null && shortcutFile.getParentFile().getName().equals("tasks")) {
-            executeIntent.putExtra("com.termux.execute.background", true);
-            // Show feedback for executed background task.
-            String message = "Task executed: " + shortcutFile.getName();
-            Toast toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
+    /**
+     * Send execution intent to TermuxService for a shortcut file.
+     *
+     * @param context The {@link Context} that will be used to send execution intent to the TermuxService.
+     * @param shortcutFilePath The path to the shortcut file.
+     */
+    public static void sendExecutionIntentToTermuxService(final Context context, String shortcutFilePath, String logTag) {
+        if (context == null) return;
+
+        logTag = DataUtils.getDefaultIfNull(logTag, LOG_TAG);
+        String errmsg;
+        Error error;
+
+        ExecutionCommand executionCommand = new ExecutionCommand();
+        executionCommand.executable = shortcutFilePath;
+
+        // If Termux app is not installed, enabled or accessible with current context or if
+        // TermuxConstants.TERMUX_PREFIX_DIR_PATH does not exist or has required permissions, then
+        // return RESULT_CODE_FAILED to plugin host app.
+        errmsg = TermuxUtils.isTermuxAppAccessible(context);
+        if (errmsg != null) {
+            Logger.logErrorAndShowToast(context, logTag, errmsg);
+            return;
+        }
+
+
+        // If executable is null or empty, then exit here instead of getting canonical path which would expand to "/"
+        if (executionCommand.executable == null || executionCommand.executable.isEmpty()) {
+            errmsg  = context.getString(R.string.error_null_or_empty_executable);
+            Logger.logErrorAndShowToast(context, logTag, errmsg);
+            return;
+        }
+
+        // Get canonical path of executable
+        executionCommand.executable = TermuxFileUtils.getCanonicalPath(executionCommand.executable, null, true);
+
+        // If executable is not under TermuxConstants#TERMUX_SHORTCUT_SCRIPTS_DIR_PATH
+        if (!FileUtils.isPathInDirPath(executionCommand.executable, TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR_PATH, true)) {
+            errmsg = context.getString(R.string.error_executable_not_under_shortcuts_directory) +
+                    "\n" + context.getString(R.string.msg_executable_absolute_path, executionCommand.executable);
+            Logger.logErrorAndShowToast(context, logTag, errmsg);
+            return;
+        }
+
+        // If executable is not a regular file, or is not readable or executable, then return
+        // RESULT_CODE_FAILED to plugin host app
+        // Setting of read and execute permissions are only done if executable is under TermuxConstants#TERMUX_SHORTCUT_SCRIPTS_DIR_PATH
+        error = FileUtils.validateRegularFileExistenceAndPermissions("executable", executionCommand.executable,
+                TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR_PATH,
+                FileUtils.APP_EXECUTABLE_FILE_PERMISSIONS,
+                true, true,
+                false);
+        if (error != null) {
+            error.appendMessage("\n" + context.getString(R.string.msg_executable_absolute_path, executionCommand.executable));
+            executionCommand.setStateFailed(error);
+            Logger.logErrorAndShowToast(context, logTag, ResultData.getErrorsListMinimalString(executionCommand.resultData));
+            return;
+        }
+
+
+        // If executable is under a directory with the basename matching TermuxConstants#TERMUX_SHORTCUT_TASKS_SCRIPTS_DIR_BASENAME
+        File shortcutFile = new File(executionCommand.executable);
+        File shortcutParentDirFile = shortcutFile.getParentFile();
+        if (shortcutParentDirFile != null && shortcutParentDirFile.getName().equals(TermuxConstants.TERMUX_SHORTCUT_TASKS_SCRIPTS_DIR_BASENAME)) {
+            executionCommand.inBackground = true;
+            // Show feedback for background task
+            Toast toast = Toast.makeText(context, context.getString(R.string.msg_executing_task,
+                    ShellUtils.getExecutableBasename(executionCommand.executable)),
+                    Toast.LENGTH_SHORT);
+            // Put the toast at the top of the screen, to avoid blocking eventual
+            // toasts made from the task with termux-toast.
+            // See https://github.com/termux/termux-widget/issues/33
+            toast.setGravity(Gravity.TOP, 0, 0);
             toast.show();
         }
-        startTermuxService(context, executeIntent);
-    }
 
-    static void startTermuxService(Context context, Intent executeIntent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // https://developer.android.com/about/versions/oreo/background.html
-            context.startForegroundService(executeIntent);
-        } else {
-            context.startService(executeIntent);
+
+        // Create execution intent with the action TERMUX_SERVICE#ACTION_SERVICE_EXECUTE to be sent to the TERMUX_SERVICE
+        executionCommand.executableUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(executionCommand.executable).build();
+        Intent executionIntent = new Intent(TERMUX_SERVICE.ACTION_SERVICE_EXECUTE, executionCommand.executableUri);
+        executionIntent.setClassName(TermuxConstants.TERMUX_PACKAGE_NAME, TermuxConstants.TERMUX_APP.TERMUX_SERVICE_NAME);
+        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND, executionCommand.inBackground);
+
+        Logger.logVerboseExtended(logTag, executionCommand.toString());
+        Logger.logDebug(logTag, "Sending execution intent to " + executionIntent.getComponent().toString() + " for \"" + executionCommand.executable + "\" with background mode " + executionCommand.inBackground);
+
+        try {
+            // Send execution intent to execution service
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // https://developer.android.com/about/versions/oreo/background.html
+                context.startForegroundService(executionIntent);
+            } else {
+                context.startService(executionIntent);
+            }
+        } catch (Exception e) {
+            errmsg = Logger.getMessageAndStackTraceString("Failed to send execution intent to " + executionIntent.getComponent().toString(), e);
+            Logger.logErrorAndShowToast(context, logTag, errmsg);
         }
     }
 
-    /** Ensure readable and executable file if user forgot to do so. */
-    static void ensureFileReadableAndExecutable(File file) {
-        if (!file.canRead()) file.setReadable(true);
-        if (!file.canExecute()) file.setExecutable(true);
-    }
 }

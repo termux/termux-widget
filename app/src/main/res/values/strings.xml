@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">Termux:Widget</string>
-    <string name="shortcut_widget_name">Termux widget</string>
-    <string name="single_shortcut_name">Termux shortcut</string>
-    <string name="no_shortcut_scripts">No files in\n$HOME/.shortcuts/</string>
-    <string name="refresh">Refresh</string>
-    <string name="termux">Termux</string>
-    <string name="scripts_reloaded">Termux shortcuts reloaded</string>
-    <string name="bad_token_message">This shortcut has become invalid - remove and add again.</string>
-    <string name="termux_shortcuts">Termux Shortcuts</string>
 
+<!DOCTYPE resources [
+    <!ENTITY TERMUX_PACKAGE_NAME "com.termux">
+    <!ENTITY TERMUX_APP_NAME "Termux">
+    <!ENTITY TERMUX_WIDGET_APP_NAME "Termux:Widget">
+    <!ENTITY TERMUX_SHORTCUT_SCRIPTS_DIR_PATH_SHORT "~/.shortcuts/">
+    ]>
+
+<resources>EXTRA_SHORTCUT_INTENT
+    <string name="app_name">&TERMUX_WIDGET_APP_NAME;</string>
+
+    <string name="title_widget">&TERMUX_APP_NAME;</string>
+    <string name="title_shortcut_widget_name">&TERMUX_APP_NAME; widget</string>
+    <string name="title_single_shortcut_name">&TERMUX_APP_NAME; shortcut</string>
+    <string name="title_termux_shortcuts">&TERMUX_APP_NAME; Shortcuts</string>
+
+    <string name="msg_scripts_reloaded">&TERMUX_APP_NAME; shortcuts reloaded</string>
+    <string name="msg_no_shortcut_scripts">No files in\n&TERMUX_SHORTCUT_SCRIPTS_DIR_PATH_SHORT;</string>
+    <string name="msg_bad_token">This shortcut is invalid - remove and add again.</string>
+    <string name="msg_executing_task">Executing task: \"%1$s\"</string>
+    <string name="msg_executable_absolute_path">Executable Absolute Path: \"%1$s\"</string>
+
+    <string name="action_refresh">Refresh</string>
+
+    <string name="error_null_or_empty_executable">The executable is null or empty.</string>
+    <string name="error_executable_not_under_shortcuts_directory">An executable can only be
+        executed if its under the &TERMUX_SHORTCUT_SCRIPTS_DIR_PATH_SHORT; directory.</string>
 </resources>

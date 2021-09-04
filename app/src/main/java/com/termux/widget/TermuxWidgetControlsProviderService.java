@@ -14,6 +14,11 @@ import android.service.controls.actions.ControlAction;
 import android.service.controls.templates.ControlTemplate;
 import android.service.controls.templates.StatelessTemplate;
 
+import com.termux.shared.settings.preferences.TermuxWidgetAppSharedPreferences;
+import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
+import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET;
+
 import org.reactivestreams.FlowAdapters;
 
 import java.io.File;
@@ -26,8 +31,6 @@ import java.util.function.Consumer;
 import io.reactivex.Flowable;
 import io.reactivex.processors.ReplayProcessor;
 
-import static com.termux.widget.TermuxLaunchShortcutActivity.TOKEN_NAME;
-
 /**
  * ControlProviderService for Android 11+ Device Control which allows running
  * Termux Widget shortcuts from device Power Menu.
@@ -36,6 +39,7 @@ import static com.termux.widget.TermuxLaunchShortcutActivity.TOKEN_NAME;
  */
 @TargetApi(Build.VERSION_CODES.R)
 public class TermuxWidgetControlsProviderService extends ControlsProviderService {
+
     private static final int WIDGET_REQUEST_CODE = 2233;
     private static final String STATELESS_TEMPLATE_ID = "2";
 
@@ -206,10 +210,9 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
     }
 
     private void addShortcutFileExtrasToIntent(File file, Intent intent) {
-        String token = TermuxLaunchShortcutActivity.getGeneratedToken(getBaseContext());
-        intent.putExtra(TOKEN_NAME, token);
+        intent.putExtra(TERMUX_WIDGET.EXTRA_TOKEN_NAME, TermuxWidgetAppSharedPreferences.getGeneratedToken(getBaseContext()));
 
-        Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(file.getAbsolutePath()).build();
+        Uri scriptUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(file.getAbsolutePath()).build();
         intent.setData(scriptUri);
     }
 
@@ -220,11 +223,11 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
     }
 
     /**
-     * Recursively finds shortcut files starting from {@link TermuxWidgetService#SHORTCUTS_DIR}
+     * Recursively finds shortcut files starting from {@link TermuxConstants#TERMUX_SHORTCUT_SCRIPTS_DIR}
      * @return List<File>
      */
     private List<File> createShortcutFilesList() {
-        File shortcutDir = TermuxWidgetService.SHORTCUTS_DIR;
+        File shortcutDir = TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR;
 
         List<File> shortcutFiles = new ArrayList<>();
         addShortcutFile(shortcutDir, shortcutFiles, 0);
@@ -259,4 +262,5 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
             }
         }
     }
+
 }

@@ -1,10 +1,12 @@
 package com.termux.widget;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
+
+import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET.TERMUX_WIDGET_PROVIDER;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -14,17 +16,12 @@ import java.util.List;
 
 public final class TermuxWidgetService extends RemoteViewsService {
 
-    @SuppressLint("SdCardPath")
-    public static final String SHORTCUTS_DIR_PATH = "/data/data/com.termux/files/home/.shortcuts";
-    public static final File SHORTCUTS_DIR = new File(SHORTCUTS_DIR_PATH);
-
-    public static final String SHORTCUT_ICONS_DIR_BASENAME ="icons";
-
     public static final FileFilter SHORTCUT_FILES_FILTER = new FileFilter() {
         public boolean accept(File file) {
             if (file.getName().startsWith("."))
                 return false;
-            else if (SHORTCUTS_DIR.equals(file.getParentFile()) && file.getName().equals(SHORTCUT_ICONS_DIR_BASENAME))
+            else if (TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR.equals(file.getParentFile()) &&
+                    file.getName().equals(TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_BASENAME))
                 return false;
             return true;
         }
@@ -34,7 +31,7 @@ public final class TermuxWidgetService extends RemoteViewsService {
 
         /** Label to display in the list. */
         public final String mLabel;
-        /** The file which this item represents, sent with the {@link TermuxWidgetProvider#EXTRA_CLICKED_FILE} extra. */
+        /** The file which this item represents, sent with the {@link TERMUX_WIDGET_PROVIDER#EXTRA_FILE_CLICKED} extra. */
         public final String mFile;
 
         public TermuxWidgetItem(File file, int depth) {
@@ -86,7 +83,7 @@ public final class TermuxWidgetService extends RemoteViewsService {
 
             // Next, we set a fill-intent which will be used to fill-in the pending intent template
             // which is set on the collection view in TermuxAppWidgetProvider.
-            Intent fillInIntent = new Intent().putExtra(TermuxWidgetProvider.EXTRA_CLICKED_FILE, widgetItem.mFile);
+            Intent fillInIntent = new Intent().putExtra(TERMUX_WIDGET_PROVIDER.EXTRA_FILE_CLICKED, widgetItem.mFile);
             rv.setOnClickFillInIntent(R.id.widget_item_layout, fillInIntent);
 
             // You can do heaving lifting in here, synchronously. For example, if you need to
@@ -119,7 +116,6 @@ public final class TermuxWidgetService extends RemoteViewsService {
             return true;
         }
 
-        @SuppressLint("SdCardPath")
         @Override
         public void onDataSetChanged() {
             // This is triggered when you call AppWidgetManager notifyAppWidgetViewDataChanged
@@ -130,9 +126,9 @@ public final class TermuxWidgetService extends RemoteViewsService {
             // locking up the widget.
             mWidgetItems.clear();
             // Create directory if necessary so user more easily finds where to put shortcuts:
-            SHORTCUTS_DIR.mkdirs();
+            TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR.mkdirs();
 
-            addFile(SHORTCUTS_DIR, mWidgetItems, 0);
+            addFile(TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR, mWidgetItems, 0);
         }
     }
 
@@ -158,4 +154,5 @@ public final class TermuxWidgetService extends RemoteViewsService {
         }
 
     }
+
 }

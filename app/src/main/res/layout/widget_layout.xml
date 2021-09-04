@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="2.0"
-                android:text="@string/termux"
+                android:text="@string/title_widget"
                 android:textColor="@android:color/primary_text_dark"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -47,7 +47,7 @@
             android:layout_below="@id/top_row"
             android:background="@android:color/white"
             android:padding="6dp"
-            android:text="@string/no_shortcut_scripts"
+            android:text="@string/msg_no_shortcut_scripts"
             android:textColor="@android:color/black" />
     </RelativeLayout>
 
@@ -58,7 +58,7 @@
         android:layout_height="34dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:contentDescription="@string/refresh"
+        android:contentDescription="@string/action_refresh"
         android:tint="#99000000"
         android:src="@android:drawable/stat_notify_sync" />
 

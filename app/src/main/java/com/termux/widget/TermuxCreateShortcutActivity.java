@@ -12,6 +12,11 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.termux.shared.settings.preferences.TermuxWidgetAppSharedPreferences;
+import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
+import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET;
+
 import java.io.File;
 import java.util.Arrays;
 
@@ -32,7 +37,7 @@ public class TermuxCreateShortcutActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        updateListview(TermuxWidgetService.SHORTCUTS_DIR);
+        updateListview(TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR);
 
         mListView.setOnItemClickListener((parent, view, position, id) -> {
             final Context context = TermuxCreateShortcutActivity.this;
@@ -44,17 +49,17 @@ public class TermuxCreateShortcutActivity extends Activity {
 
             Intent.ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(context, R.drawable.ic_launcher);
 
-            Uri scriptUri = new Uri.Builder().scheme("com.termux.file").path(clickedFile.getAbsolutePath()).build();
+            Uri scriptUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(clickedFile.getAbsolutePath()).build();
             Intent executeIntent = new Intent(context, TermuxLaunchShortcutActivity.class);
             executeIntent.setData(scriptUri);
-            executeIntent.putExtra(TermuxLaunchShortcutActivity.TOKEN_NAME, TermuxLaunchShortcutActivity.getGeneratedToken(context));
+            executeIntent.putExtra(TERMUX_WIDGET.EXTRA_TOKEN_NAME, TermuxWidgetAppSharedPreferences.getGeneratedToken(context));
 
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, executeIntent);
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, clickedFile.getName());
 
-            File scriptIcon = new File(TermuxWidgetService.SHORTCUTS_DIR_PATH + "/" +
-                    TermuxWidgetService.SHORTCUT_ICONS_DIR_BASENAME + "/" + clickedFile.getName() + ".png");
+            File scriptIcon = new File(TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +
+                    "/" + clickedFile.getName() + ".png");
             if (scriptIcon.exists()) {
                 BitmapDrawable bitmapDrawable = (BitmapDrawable)Drawable.createFromPath(scriptIcon.getAbsolutePath());
                 intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, bitmapDrawable.getBitmap());
@@ -75,14 +80,14 @@ public class TermuxCreateShortcutActivity extends Activity {
 
         Arrays.sort(mCurrentFiles, (f1, f2) -> f1.getName().compareTo(f2.getName()));
 
-        final boolean isTopDir = directory.equals(TermuxWidgetService.SHORTCUTS_DIR);
+        final boolean isTopDir = directory.equals(TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR);
         getActionBar().setDisplayHomeAsUpEnabled(!isTopDir);
 
         if (isTopDir && mCurrentFiles.length == 0) {
             // Create if necessary so user can more easily add.
-            TermuxWidgetService.SHORTCUTS_DIR.mkdirs();
+            TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR.mkdirs();
             new AlertDialog.Builder(this)
-                    .setMessage(R.string.no_shortcut_scripts)
+                    .setMessage(R.string.msg_no_shortcut_scripts)
                     .setOnDismissListener(dialog -> finish()).show();
             return;
         }
@@ -104,4 +109,5 @@ public class TermuxCreateShortcutActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

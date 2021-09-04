@@ -8,6 +8,10 @@ android {
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
         versionCode 12
         versionName "0.12"
+
+        manifestPlaceholders.TERMUX_PACKAGE_NAME = "com.termux"
+        manifestPlaceholders.TERMUX_APP_NAME = "Termux"
+        manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Termux:Widget"
     }
 
     signingConfigs {
@@ -56,4 +60,10 @@ dependencies {
     // required for TermuxWidgetControlsProviderService
     implementation "org.reactivestreams:reactive-streams:1.0.3"
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
+
+    implementation 'com.termux.termux-app:termux-shared:23b707a819'
+
+    // Use if below libraries are published locally by termux-app with `./gradlew publishReleasePublicationToMavenLocal` and used with `mavenLocal()`.
+    // If updates are done, republish there and sync project with gradle files here
+    //implementation 'com.termux:termux-shared:0.117'
 }

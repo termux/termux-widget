@@ -1,16 +1,6 @@
 package com.termux.widget;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.util.Log;
-import android.view.Gravity;
-import android.widget.Toast;
-
-import java.io.File;
-import java.util.UUID;
 
 /**
  * An activity to launch a shortcut. We want to a launch a service directly, but a shortcut
@@ -18,31 +8,17 @@ import java.util.UUID;
  */
 public class TermuxLaunchShortcutActivity extends Activity {
 
-	static final String TOKEN_NAME = "com.termux.shortcut.token";
-
-	public static String getGeneratedToken(Context context) {
-		SharedPreferences prefs = context.getSharedPreferences("token", Context.MODE_PRIVATE);
-		String token = prefs.getString("token", null);
-		if (token == null) {
-			token = UUID.randomUUID().toString();
-			prefs.edit().putString("token", token).apply();
-		}
-		return token;
-	}
+	private static final String LOG_TAG = "TermuxLaunchShortcutActivity";
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 
-		Intent intent = getIntent();
-		String token = intent.getStringExtra(TOKEN_NAME);
-		if (token == null || !token.equals(getGeneratedToken(this))) {
-			Log.w("termux", "Strange token: " + token);
-			Toast.makeText(this, R.string.bad_token_message, Toast.LENGTH_LONG).show();
-			finish();
-			return;
-		}
-		TermuxWidgetProvider.handleTermuxShortcutExecuteIntent(this, intent);
+		// Set log level for the app
+		TermuxWidgetApplication.setLogLevel(this, true);
+
+		TermuxWidgetProvider.handleTermuxShortcutExecutionIntent(this, getIntent(), LOG_TAG);
 		finish();
 	}
+
 }

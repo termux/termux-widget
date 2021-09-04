@@ -2,13 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.termux.widget"
-    android:sharedUserId="com.termux">
+    android:sharedUserId="${TERMUX_PACKAGE_NAME}">
 
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
 
     <application
+        android:name=".TermuxWidgetApplication"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -16,7 +17,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <receiver
             android:name=".TermuxWidgetProvider"
-            android:label="@string/shortcut_widget_name" >
+            android:label="@string/title_shortcut_widget_name" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -28,7 +29,7 @@
 
         <activity
             android:name=".TermuxCreateShortcutActivity"
-            android:label="@string/single_shortcut_name">
+            android:label="@string/title_single_shortcut_name">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -47,7 +48,7 @@
 
         <service
             android:name=".TermuxWidgetControlsProviderService"
-            android:label="@string/termux_shortcuts"
+            android:label="@string/title_termux_shortcuts"
             android:permission="android.permission.BIND_CONTROLS">
             <intent-filter>
                 <action android:name="android.service.controls.ControlsProviderService" />
