@@ -1,4 +1,5 @@
 build/
+release/
 *.iml
 .idea/
 .gradle/
