@@ -1,21 +1,32 @@
 package com.termux.widget;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.termux.shared.data.DataUtils;
+import com.termux.shared.file.FileUtils;
+import com.termux.shared.file.TermuxFileUtils;
+import com.termux.shared.logger.Logger;
 import com.termux.shared.settings.preferences.TermuxWidgetAppSharedPreferences;
+import com.termux.shared.shell.ShellUtils;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
 import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET;
+import com.termux.shared.termux.TermuxUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -25,6 +36,8 @@ public class TermuxCreateShortcutActivity extends Activity {
     private ListView mListView;
     private File mCurrentDirectory;
     private File[] mCurrentFiles;
+
+    private static final String LOG_TAG = "TermuxCreateShortcutActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +50,13 @@ public class TermuxCreateShortcutActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
+        String errmsg = TermuxUtils.isTermuxAppAccessible(this);
+        if (errmsg != null) {
+            Logger.logErrorAndShowToast(this, LOG_TAG, errmsg);
+            finish();
+            return;
+        }
+
         updateListview(TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR);
 
         mListView.setOnItemClickListener((parent, view, position, id) -> {
@@ -44,31 +64,10 @@ public class TermuxCreateShortcutActivity extends Activity {
             File clickedFile = mCurrentFiles[position];
             if (clickedFile.isDirectory()) {
                 updateListview(clickedFile);
-                return;
-            }
-
-            Intent.ShortcutIconResource icon = Intent.ShortcutIconResource.fromContext(context, R.drawable.ic_launcher);
-
-            Uri scriptUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(clickedFile.getAbsolutePath()).build();
-            Intent executeIntent = new Intent(context, TermuxLaunchShortcutActivity.class);
-            executeIntent.setData(scriptUri);
-            executeIntent.putExtra(TERMUX_WIDGET.EXTRA_TOKEN_NAME, TermuxWidgetAppSharedPreferences.getGeneratedToken(context));
-
-            Intent intent = new Intent();
-            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, executeIntent);
-            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, clickedFile.getName());
-
-            File scriptIcon = new File(TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +
-                    "/" + clickedFile.getName() + ".png");
-            if (scriptIcon.exists()) {
-                BitmapDrawable bitmapDrawable = (BitmapDrawable)Drawable.createFromPath(scriptIcon.getAbsolutePath());
-                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, bitmapDrawable.getBitmap());
             } else {
-                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, icon);
+                createShortcut(context, clickedFile);
+                finish();
             }
-
-            setResult(RESULT_OK, intent);
-            finish();
         });
     }
 
@@ -104,10 +103,90 @@ public class TermuxCreateShortcutActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            updateListview(mCurrentDirectory.getParentFile());
+            updateListview(DataUtils.getDefaultIfNull(mCurrentDirectory.getParentFile(), mCurrentDirectory));
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+    private void createShortcut(Context context, File clickedFile) {
+        boolean isPinnedShortcutSupported = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ShortcutManager shortcutManager = (ShortcutManager) context.getSystemService(Context.SHORTCUT_SERVICE);
+            if (shortcutManager != null && shortcutManager.isRequestPinShortcutSupported())
+                isPinnedShortcutSupported = true;
+        }
+
+        String shortcutFilePath = FileUtils.getCanonicalPath(clickedFile.getAbsolutePath(), null);
+
+        try {
+            if (isPinnedShortcutSupported)
+                createPinnedShortcut(context, shortcutFilePath);
+            else
+                createStaticShortcut(context, shortcutFilePath);
+        } catch (Exception e) {
+            String message = context.getString(
+                    isPinnedShortcutSupported ? R.string.error_create_pinned_shortcut_failed : R.string.error_create_static_shortcut_failed,
+                    TermuxFileUtils.getUnExpandedTermuxPath(shortcutFilePath));
+            Logger.logErrorAndShowToast(context, LOG_TAG, message + ": " + e.getMessage());
+            Logger.logStackTraceWithMessage(LOG_TAG, message, e);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private void createPinnedShortcut(Context context, String shortcutFilePath) {
+        ShortcutManager shortcutManager = (ShortcutManager) context.getSystemService(Context.SHORTCUT_SERVICE);
+        if (shortcutManager == null) return;
+
+        String shortcutFileName = ShellUtils.getExecutableBasename(shortcutFilePath);
+
+        ShortcutInfo.Builder builder = new ShortcutInfo.Builder(context, shortcutFilePath);
+        builder.setIntent(getExecutionIntent(context, shortcutFilePath));
+        builder.setShortLabel(shortcutFileName);
+
+        File shortcutIconFile = getShortcutIconFile(shortcutFileName);
+        if (shortcutIconFile.exists())
+            builder.setIcon(Icon.createWithBitmap(((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap()));
+        else
+            builder.setIcon(Icon.createWithResource(context, R.drawable.ic_launcher));
+
+        Logger.showToast(context, context.getString(R.string.msg_request_create_pinned_shortcut,
+                TermuxFileUtils.getUnExpandedTermuxPath(shortcutFilePath)), true);
+        shortcutManager.requestPinShortcut(builder.build(), null);
+    }
+
+    private void createStaticShortcut(Context context, String shortcutFilePath) {
+        String shortcutFileName = ShellUtils.getExecutableBasename(shortcutFilePath);
+
+        Intent intent = new Intent();
+        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, getExecutionIntent(context, shortcutFilePath));
+        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, shortcutFileName);
+
+        File shortcutIconFile = getShortcutIconFile(shortcutFileName);
+        if (shortcutIconFile.exists())
+            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, ((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap());
+        else
+            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(context, R.drawable.ic_launcher));
+
+        Logger.showToast(context, context.getString(R.string.msg_request_create_static_shortcut,
+                TermuxFileUtils.getUnExpandedTermuxPath(shortcutFilePath)), true);
+        setResult(RESULT_OK, intent);
+    }
+
+    private Intent getExecutionIntent(Context context, String shortcutFilePath) {
+        Uri scriptUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(shortcutFilePath).build();
+        Intent executionIntent = new Intent(context, TermuxLaunchShortcutActivity.class);
+        executionIntent.setAction(TERMUX_SERVICE.ACTION_SERVICE_EXECUTE); // Mandatory for pinned shortcuts
+        executionIntent.setData(scriptUri);
+        executionIntent.putExtra(TERMUX_WIDGET.EXTRA_TOKEN_NAME, TermuxWidgetAppSharedPreferences.getGeneratedToken(context));
+        return executionIntent;
+    }
+
+    private File getShortcutIconFile(String shortcutFileName) {
+       return new File(TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +
+                "/" + shortcutFileName + ".png");
     }
 
 }

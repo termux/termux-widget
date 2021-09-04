@@ -14,7 +14,6 @@ import android.widget.Toast;
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.data.IntentUtils;
 import com.termux.shared.file.FileUtils;
-import com.termux.shared.file.TermuxFileUtils;
 import com.termux.shared.file.filesystem.FileType;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.models.ExecutionCommand;
@@ -37,6 +36,13 @@ import java.io.File;
 public final class TermuxWidgetProvider extends AppWidgetProvider {
 
     private static final String LOG_TAG = "TermuxWidgetProvider";
+
+    public void onEnabled(Context context) {
+        String errmsg = TermuxUtils.isTermuxAppAccessible(context);
+        if (errmsg != null) {
+            Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
+        }
+    }
 
     /**
      * "This is called to update the App Widget at intervals defined by the updatePeriodMillis attribute in the
@@ -98,6 +104,12 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
                 sendExecutionIntentToTermuxService(context, clickedFilePath, LOG_TAG);
                 break;
             case TERMUX_WIDGET_PROVIDER.ACTION_REFRESH_WIDGET:
+                String errmsg = TermuxUtils.isTermuxAppAccessible(context);
+                if (errmsg != null) {
+                    Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
+                    return;
+                }
+
                 int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
                 AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
 
@@ -150,7 +162,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 
         // If Termux app is not installed, enabled or accessible with current context or if
         // TermuxConstants.TERMUX_PREFIX_DIR_PATH does not exist or has required permissions, then
-        // return RESULT_CODE_FAILED to plugin host app.
+        // just return.
         errmsg = TermuxUtils.isTermuxAppAccessible(context);
         if (errmsg != null) {
             Logger.logErrorAndShowToast(context, logTag, errmsg);
@@ -166,7 +178,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         }
 
         // Get canonical path of executable
-        executionCommand.executable = TermuxFileUtils.getCanonicalPath(executionCommand.executable, null, true);
+        executionCommand.executable = FileUtils.getCanonicalPath(executionCommand.executable, null);
 
         // If executable is not under TermuxConstants#TERMUX_SHORTCUT_SCRIPTS_DIR_PATH
         if (!FileUtils.isPathInDirPath(executionCommand.executable, TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR_PATH, true)) {
@@ -227,8 +239,9 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
                 context.startService(executionIntent);
             }
         } catch (Exception e) {
-            errmsg = Logger.getMessageAndStackTraceString("Failed to send execution intent to " + executionIntent.getComponent().toString(), e);
-            Logger.logErrorAndShowToast(context, logTag, errmsg);
+            String message = "Failed to send execution intent to " + executionIntent.getComponent().toString();
+            Logger.logErrorAndShowToast(context, logTag, message + ": " + e.getMessage());
+            Logger.logStackTraceWithMessage(logTag, message, e);
         }
     }
 

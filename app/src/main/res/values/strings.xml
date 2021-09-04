@@ -20,10 +20,15 @@
     <string name="msg_bad_token">This shortcut is invalid - remove and add again.</string>
     <string name="msg_executing_task">Executing task: \"%1$s\"</string>
     <string name="msg_executable_absolute_path">Executable Absolute Path: \"%1$s\"</string>
+    <string name="msg_request_create_pinned_shortcut">Requesting to create pinned shortcut for \"%1$s\"</string>
+    <string name="msg_request_create_static_shortcut">Requesting to create static shortcut for \"%1$s\"</string>
 
     <string name="action_refresh">Refresh</string>
 
     <string name="error_null_or_empty_executable">The executable is null or empty.</string>
     <string name="error_executable_not_under_shortcuts_directory">An executable can only be
         executed if its under the &TERMUX_SHORTCUT_SCRIPTS_DIR_PATH_SHORT; directory.</string>
+    <string name="error_create_pinned_shortcut_failed">Failed to create pinned shortcut for \"%1$s\"</string>
+    <string name="error_create_static_shortcut_failed">Failed to create static shortcut for \"%1$s\"</string>
+
 </resources>
