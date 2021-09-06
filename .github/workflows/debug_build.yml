@@ -15,4 +15,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: termux-widget
-        path: ./app/build/outputs/apk/debug/termux-widget-debug.apk
+        path: |
+          ./app/build/outputs/apk/debug/termux-widget-debug.apk
+          ./app/build/outputs/apk/debug/output-metadata.json
