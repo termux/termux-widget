@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.termux.shared.file.FileUtils;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET.TERMUX_WIDGET_PROVIDER;
 
@@ -18,8 +19,16 @@ public final class TermuxWidgetService extends RemoteViewsService {
 
     public static final FileFilter SHORTCUT_FILES_FILTER = new FileFilter() {
         public boolean accept(File file) {
+            // Do not show hidden files starting with a dot.
             if (file.getName().startsWith("."))
                 return false;
+            // Do not show broken symlinks
+            else if (!FileUtils.fileExists(file.getAbsolutePath(), true))
+                return false;
+            // Do not show files that are not under TermuxConstants#TERMUX_SHORTCUT_SCRIPTS_DIR_PATH
+            else if (!FileUtils.isPathInDirPath(file.getAbsolutePath(), TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR_PATH, true))
+                return false;
+            // Do not show files under TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH
             else if (TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR.equals(file.getParentFile()) &&
                     file.getName().equals(TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_BASENAME))
                 return false;
