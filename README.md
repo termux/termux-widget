@@ -25,7 +25,3 @@ page.
 Signature keys of all offered builds are different. Before you switch the
 installation source, you will have to uninstall the Termux application and
 all currently installed plugins.
-
-## License
-
-Released under the [GPLv3 license](https://www.gnu.org/licenses/gpl-3.0.html).
