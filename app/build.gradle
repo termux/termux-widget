@@ -63,6 +63,7 @@ dependencies {
     implementation "org.reactivestreams:reactive-streams:1.0.3"
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
 
+    implementation "androidx.annotation:annotation:1.2.0"
     implementation 'com.termux.termux-app:termux-shared:23b707a819'
 
     // Use if below libraries are published locally by termux-app with `./gradlew publishReleasePublicationToMavenLocal` and used with `mavenLocal()`.

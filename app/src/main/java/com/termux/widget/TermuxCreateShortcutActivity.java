@@ -17,9 +17,12 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import androidx.annotation.Nullable;
+
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.file.TermuxFileUtils;
+import com.termux.shared.file.filesystem.FileType;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.settings.preferences.TermuxWidgetAppSharedPreferences;
 import com.termux.shared.shell.ShellUtils;
@@ -146,8 +149,8 @@ public class TermuxCreateShortcutActivity extends Activity {
         builder.setIntent(getExecutionIntent(context, shortcutFilePath));
         builder.setShortLabel(shortcutFileName);
 
-        File shortcutIconFile = getShortcutIconFile(shortcutFileName);
-        if (shortcutIconFile.exists())
+        File shortcutIconFile = getShortcutIconFile(context, shortcutFileName);
+        if (shortcutIconFile != null)
             builder.setIcon(Icon.createWithBitmap(((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap()));
         else
             builder.setIcon(Icon.createWithResource(context, R.drawable.ic_launcher));
@@ -164,8 +167,8 @@ public class TermuxCreateShortcutActivity extends Activity {
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, getExecutionIntent(context, shortcutFilePath));
         intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, shortcutFileName);
 
-        File shortcutIconFile = getShortcutIconFile(shortcutFileName);
-        if (shortcutIconFile.exists())
+        File shortcutIconFile = getShortcutIconFile(context, shortcutFileName);
+        if (shortcutIconFile != null)
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, ((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap());
         else
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(context, R.drawable.ic_launcher));
@@ -184,9 +187,36 @@ public class TermuxCreateShortcutActivity extends Activity {
         return executionIntent;
     }
 
-    private File getShortcutIconFile(String shortcutFileName) {
-       return new File(TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +
-                "/" + shortcutFileName + ".png");
+    @Nullable
+    private File getShortcutIconFile(Context context, String shortcutFileName) {
+        String errmsg;
+        String shortcutIconFilePath = FileUtils.getCanonicalPath(
+                TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +
+                "/" + shortcutFileName + ".png", null);
+
+        FileType fileType = FileUtils.getFileType(shortcutIconFilePath, true);
+        //  Ensure file or symlink points to a regular file that exists
+        if (fileType != FileType.REGULAR) {
+            if (fileType != FileType.NO_EXIST) {
+                errmsg = context.getString(R.string.error_icon_not_a_regular_file, fileType.getName()) +
+                        "\n" + context.getString(R.string.msg_icon_absolute_path, shortcutIconFilePath);
+                Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
+            }
+            return null;
+        }
+
+        // Do not allow icons files not under TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH
+        if (!FileUtils.isPathInDirPath(shortcutIconFilePath, TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH, true)) {
+            errmsg = context.getString(R.string.error_icon_not_under_shortcut_icons_directory) +
+                    "\n" + context.getString(R.string.msg_icon_absolute_path, shortcutIconFilePath);
+            Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
+            return null;
+        }
+
+        Logger.logInfo(LOG_TAG, "Using file at \"" + shortcutIconFilePath + "\" as shortcut icon file");
+        Logger.showToast(context, "Using file at \"" + shortcutIconFilePath + "\" as shortcut icon file", true);
+
+        return new File(shortcutIconFilePath);
     }
 
 }
