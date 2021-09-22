@@ -54,6 +54,8 @@ The `~/.shortcuts/` directory stores the scripts that can be run with the plugin
 
 The parent directory of the scripts must have read permission, otherwise the plugin will not be able to read the script files and will not show any scripts in the launcher widget and will give errors like `No regular file found at path` when executing launcher shortcuts. The parent directory of the script must also have executable permissions for the script to be allowed to execute.
 
+Files under hidden directories whose name starts with a dot `.`, broken symlinks or files whose canonical path is not under the `~/.shortcuts` directory are not shown in the widget and execution is not allowed for the later either.
+
 Open a non-root termux session and run the below commands to create the directories and give them read, write and executable permissions `(0700)`.
 
 - Create `~/.shortcuts/` directory.
@@ -72,7 +74,9 @@ chmod 700 -R /data/data/com.termux/files/home/.shortcuts/tasks
 
 Once you have created the directories, you can then create scripts files as per instructions in [Creating And Modifying Scripts](#Creating-And-Modifying-Scripts).
 
-Once you have created script files, you can add a launcher widget for the `Termux:Widget` app that will show the list of the script files, which you can execute by clicking them. You can also add a launcher shortcut for any script file.
+Once you have created script files, you can add a launcher widget for the `Termux:Widget` app that will show the list of the script files, which you can execute by clicking them. If you create/modify shortcuts files, you will have to press the refresh button on the widget for the updated list to be shown. You can also refresh a specific widget by running `am broadcast -n com.termux.widget/.TermuxWidgetProvider -a com.termux.widget.ACTION_REFRESH_WIDGET --ei appWidgetId <id>` from Termux terminal/scripts for version `>= 0.13.0`, where `id` is the number in the `Termux shortcuts reloaded (<id>)` flash shown when you press the refresh button.
+
+You can also add a launcher shortcut for any script file with an optional custom icon as detailed in [Script Icon Directory](#script-icon-directory-optional).
 
 <img src="termux-widget.png" alt="" width="50%"/>
 
@@ -81,6 +85,8 @@ Once you have created script files, you can add a launcher widget for the `Termu
 The `~/.shortcuts/icons` directory stores the icon that will be used for a script when a launcher shortcut is created for it for version `>= 0.12`. The icon file name must be equal to `<script_name>.png`, like `script.sh.png`. For a `1080p` `~6in` screen, something like `96x96px` `png` file should probably be fine, otherwise try `144px` or `196px` for higher resolution screens.
 
 The parent directory of the icons must have read permission, otherwise the plugin will not be able to read them.
+
+The icon file must be a regular file and its canonical path must exist under `~/.shortcuts/icons` directory.
 
 Open a non-root termux session and run the below commands to create the directory and give it read and write permissions `(0600)`.
 
