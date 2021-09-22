@@ -3,25 +3,162 @@
 [![Build status](https://github.com/termux/termux-widget/workflows/Build/badge.svg)](https://github.com/termux/termux-widget/actions)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-A [Termux](https://termux.com) add-on app adding shortcuts to commands on the
-home screen.
+A [Termux] plugin app adding shortcuts to commands on the home screen.
 
-When developing (or packaging), note that this app needs to be signed with the
-same key as the main Termux app in order to have the permission to execute scripts.
 
-## Installation
 
-Termux:Widget application can be obtained from:
+### Contents
+- [Installation](#Installation)
+- [Setup Instructions](#Setup-Instructions)
+- [Creating And Modifying Scripts](#Creating-And-Modifying-Scripts)
+- [Debugging](#Debugging)
+- [Worthy Of Note](#Worthy-Of-Note)
+- [For Maintainers and Contributors](#For-Maintainers-and-Contributors)
+- [Forking](#Forking)
+##
 
-- [Google Play](https://play.google.com/store/apps/details?id=com.termux.widget)
-- [F-Droid](https://f-droid.org/en/packages/com.termux.widget/)
-- [Kali Nethunter Store](https://store.nethunter.com/en/packages/com.termux.widget/)
 
-Additionally we provide per-commit debug builds for those who want to try
-out the latest features or test their pull request. This build can be obtained
-from one of the workflow runs listed on [Github Actions](https://github.com/termux/termux-widget/actions)
-page.
 
-Signature keys of all offered builds are different. Before you switch the
-installation source, you will have to uninstall the Termux application and
-all currently installed plugins.
+### Installation
+
+Check [`termux-app` Installation](https://github.com/termux/termux-app#Installation) for details before reading forward.
+
+### F-Droid
+
+`Termux:Widget` application can be obtained from `F-Droid` from [here](https://f-droid.org/en/packages/com.termux.widget/).
+
+You **do not** need to download the `F-Droid` app (via the `Download F-Droid` link) to install `Termux:Widget`. You can download the `Termux:Widget` APK directly from the site by clicking the `Download APK` link at the bottom of each version section.
+
+### Github
+
+`Termux:Widget` application can be obtained on `Github` either from [`Github Releases`](https://github.com/termux/termux-widget/releases) for version `>= 0.13.0` or from [`Github Build`](https://github.com/termux/termux-widget/actions/workflows/debug_build.yml) action workflows.
+
+The APKs for `Github Releases` will be listed under `Assets` drop-down of a release. These are automatically attached when a new version is released.
+
+The APKs for `Github Build` action workflows will be listed under `Artifacts` section of a workflow run. These are created for each commit/push done to the repository and can be used by users who don't want to wait for releases and want to try out the latest features immediately or want to test their pull requests.
+
+The APKs for both of these are [`debuggable`](https://developer.android.com/studio/debug) and are compatible with each other but they are not compatible with other sources.
+##
+
+
+
+### Setup Instructions
+
+#### Install `Termux` app (Mandatory)
+The `Termux:Widget` plugin requires [Termux] app to run the actual commands. You need to install it and start it at least once and have it install the bootstrap files for the plugin to start working. The Termux prefix directory `/data/data/com.termux/files/usr/` and Termux home directory `/data/data/com.termux/files/home/` must also exist and must have read, write and execute permissions `(0700)` for the plugin to work. The `$PREFIX/` is shortcut for the Termux [prefix directory](https://github.com/termux/termux-packages/wiki/Termux-file-system-layout) and can also be referred by the `$PREFIX` shell environment variable. The `~/` is a shortcut for the Termux home directory and can also be referred by the `$HOME` shell environment variable. Note that `~/` will not expand inside single or double quotes when running commands. Permissions and ownerships can be checked with the `stat <path>` command.
+
+
+#### Script Directories (Mandatory)
+
+The `~/.shortcuts/` directory stores the scripts that can be run with the plugin in foreground terminal sessions in the `Termux` app. The `~/.shortcuts/tasks` directory stores the scripts that can be run with the plugin in background with the `Termux` app and will show as running tasks in `Termux` app notification.
+
+The parent directory of the scripts must have read permission, otherwise the plugin will not be able to read the script files and will not show any scripts in the launcher widget and will give errors like `No regular file found at path` when executing launcher shortcuts. The parent directory of the script must also have executable permissions for the script to be allowed to execute.
+
+Open a non-root termux session and run the below commands to create the directories and give them read, write and executable permissions `(0700)`.
+
+- Create `~/.shortcuts/` directory.
+
+```
+mkdir -p /data/data/com.termux/files/home/.shortcuts
+chmod 700 -R /data/data/com.termux/files/home/.shortcuts
+```
+
+- Create `~/.shortcuts/tasks` directory.
+
+```
+mkdir -p /data/data/com.termux/files/home/.shortcuts/tasks
+chmod 700 -R /data/data/com.termux/files/home/.shortcuts/tasks
+```
+
+Once you have created the directories, you can then create scripts files as per instructions in [Creating And Modifying Scripts](#Creating-And-Modifying-Scripts).
+
+Once you have created script files, you can add a launcher widget for the `Termux:Widget` app that will show the list of the script files, which you can execute by clicking them. You can also add a launcher shortcut for any script file.
+
+<img src="termux-widget.png" alt="" width="50%"/>
+
+#### Script Icon Directory (Optional)
+
+The `~/.shortcuts/icons` directory stores the icon that will be used for a script when a launcher shortcut is created for it for version `>= 0.12`. The icon file name must be equal to `<script_name>.png`, like `script.sh.png`. For a `1080p` `~6in` screen, something like `96x96px` `png` file should probably be fine, otherwise try `144px` or `196px` for higher resolution screens.
+
+The parent directory of the icons must have read permission, otherwise the plugin will not be able to read them.
+
+Open a non-root termux session and run the below commands to create the directory and give it read and write permissions `(0600)`.
+
+- Create `~/.shortcuts/icons` directory.
+
+```
+mkdir -p /data/data/com.termux/files/home/.shortcuts/icons
+chmod 600 -R /data/data/com.termux/files/home/.shortcuts/icons
+```
+
+#### `Draw Over Apps` permission (Optional)
+
+For android `>= 10` there are new [restrictions](https://developer.android.com/guide/components/activities/background-starts) that prevent activities from starting from the background. This prevents the background `TermuxService` from starting a terminal session in the foreground and running the commands until the user manually clicks `Termux` notification in the status bar dropdown notifications list. This only affects plugin commands that are to be executed in a terminal session and not the background ones. `Termux` version `>= 0.100` requests the `Draw Over Apps` permission so that users can bypass this restriction so that commands can automatically start running without user intervention. You can grant `Termux` the `Draw Over Apps` permission from its `App Info` activity `Android Settings` -> `Apps` -> `Termux` -> `Advanced` -> `Draw over other apps`.
+##
+
+
+
+### Creating And Modifying Scripts
+
+You can create scripts in `~/.shortcuts/` and `~/.shortcuts/tasks` directories after following their [Setup Instructions](#Setup-Instructions).
+
+You can use `shell` based text editors like `nano`, `vim` or `emacs` to create and modify scripts.
+
+`nano ~/.shortcuts/some_script`
+
+You can also use `GUI` based text editor android apps that support `SAF`. Termux provides a [Storage Access Framework (SAF)](https://wiki.termux.com/wiki/Internal_and_external_storage) file provider to allow other apps to access its `~/` home directory. However, the `$PREFIX/` directory is not accessible to other apps. The [QuickEdit] or [QuickEdit Pro] app does support `SAF` and can handle large files without crashing, however, it is closed source and its pro version without ads is paid. You can also use [Acode editor] or [Turbo Editor] if you want an open source app.
+
+Note that the android default `SAF` `Document` file picker may not support hidden file or directories like `~/.shortcuts` which start with a dot `.`, so if you try to use it to open files for a text editor app, then that directory will not show. You can instead create a symlink for  `~/.shortcuts` at `~/shortcuts_sym` so that it is shown. Use `ln -s "/data/data/com.termux/files/home/.shortcuts" "/data/data/com.termux/files/home/shortcuts_sym"` to create it.
+##
+
+
+
+### Debugging
+
+You can help debug problems like how plugin shortcuts and scripts are being parsed by the plugin or if the plugin is even firing etc by setting appropriate `logcat` `Log Level` in `Termux` app settings -> `Termux:Widget` -> `Debugging` -> `Log Level` (Requires `Termux` app version `>= 0.118.0`). The `Log Level` defaults to `Normal` and log level `Verbose` currently logs additional information. Its best to revert log level to `Normal` after you have finished debugging since private data may otherwise be passed to `logcat` during normal operation and moreover, additional logging increases execution time.
+
+The plugin **does not execute the commands itself** but sends an execution intent to `Termux` app, which has its own log level which can be set in `Termux` app settings -> `Termux` -> `Debugging` -> `Log Level`. So you must set log level for both `Termux` and `Termux:Widget` app settings to get all the info.
+
+Once log levels have been set, you can run the `logcat` command in `Termux` app terminal to view the logs in realtime (`Ctrl+c` to stop) or use `logcat -d` to take a dump of the log. You can also view the logs from a PC over `ADB`. For more information, check official android `logcat` guide [here](https://developer.android.com/studio/command-line/logcat).
+
+##### Log Levels
+
+- `Off` - Log nothing.
+- `Normal` - Start logging error, warn and info messages and stacktraces.
+- `Debug` - Start logging debug messages.
+- `Verbose` - Start logging verbose messages.
+##
+
+
+
+### Worthy Of Note
+
+##### Termux Environment
+
+Termux does not load the environment fully for external plugins or [RUN_COMMAND Intent] commands, like setting `LD_PRELOAD`, so any *external* scripts which do not have shebangs to full path to termux bin directory will not work if called from inside your *plugin* scripts, since `libtermux-exec.so` is not called since `LD_PRELOAD` isn't set and you will get `bad interpreter: No such file or directory` errors. Simply setting `LD_PRELOAD` will not work either without starting a new shell. So make sure to set the shebangs correctly for any *external* scripts you want to run from inside your *plugin* script. The correct shebangs for termux scripts are like `#!/data/data/com.termux/files/usr/bin/bash` for bash scripts instead of `#!/usr/bin/bash` used in common linux distros. You can also use [termux-fix-shebang](https://wiki.termux.com/wiki/Termux-fix-shebang) command on the *external* scripts before running them with the plugin to fix the shebangs automatically or use `tudo`/`sudo`.
+
+The [`tudo`](https://github.com/agnostic-apollo/tudo) script can be used for running commands in termux user context and the [`sudo`](https://github.com/agnostic-apollo/sudo) script for running commands with super user (root) context. You can call the *external* scripts in your scripts with the `path` command type of `tudo`/`sudo`. These scripts will load the termux environment properly like setting `LD_PRELOAD` etc before running the commands.
+##
+
+
+
+## For Maintainers and Contributors
+
+Check [For Maintainers and Contributors](https://github.com/termux/termux-app#For-Maintainers-and-Contributors) section of `termux/termux-app` `README` for details.
+##
+
+
+
+## Forking
+
+Check [Forking](https://github.com/termux/termux-app#Forking) section of `termux/termux-app` `README` for details.
+##
+
+
+
+[Termux]: https://termux.com
+[QuickEdit]: https://play.google.com/store/apps/details?id=com.rhmsoft.edit
+[QuickEdit Pro]: https://play.google.com/store/apps/details?id=com.rhmsoft.edit.pro
+[Acode editor]: https://github.com/deadlyjack/code-editor
+[Turbo Editor]: https://github.com/vmihalachi/turbo-editor
+[RUN_COMMAND Intent]: https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/RunCommandService.java
