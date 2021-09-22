@@ -9,6 +9,7 @@
 
 <resources>EXTRA_SHORTCUT_INTENT
     <string name="app_name">&TERMUX_WIDGET_APP_NAME;</string>
+    <string name="help">Visit %1$s for more info on plugin usage.</string>
 
     <string name="title_widget">&TERMUX_APP_NAME;</string>
     <string name="title_shortcut_widget_name">&TERMUX_APP_NAME; widget</string>
