@@ -111,9 +111,10 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
                 }
 
                 int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+                if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) return;
                 AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
 
-                Toast toast = Toast.makeText(context, R.string.msg_scripts_reloaded, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(context, context.getString(R.string.msg_scripts_reloaded, appWidgetId), Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
                 break;
