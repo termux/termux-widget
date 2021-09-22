@@ -23,7 +23,7 @@ jobs:
       - name: Store generated APK file
         uses: actions/upload-artifact@v2
         with:
-          name: termux-widget
+          name: termux-widget_${{ env.TERMUX_WIDGET_APK_VERSION_TAG }}
           path: |
             ./app/build/outputs/apk/debug/termux-widget_${{ env.TERMUX_WIDGET_APK_VERSION_TAG }}.apk
             ./app/build/outputs/apk/debug/output-metadata.json
