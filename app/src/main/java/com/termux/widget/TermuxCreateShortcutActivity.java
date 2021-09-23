@@ -19,6 +19,7 @@ import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 
+import com.google.common.base.Joiner;
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.file.TermuxFileUtils;
@@ -205,9 +206,10 @@ public class TermuxCreateShortcutActivity extends Activity {
             return null;
         }
 
-        // Do not allow icons files not under TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH
-        if (!FileUtils.isPathInDirPath(shortcutIconFilePath, TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH, true)) {
-            errmsg = context.getString(R.string.error_icon_not_under_shortcut_icons_directory) +
+        // Do not allow shortcut icons files not under SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST
+        if (!FileUtils.isPathInDirPaths(shortcutIconFilePath, TermuxWidgetService.SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST, true)) {
+            errmsg = context.getString(R.string.error_icon_not_under_shortcut_icons_directories,
+                    Joiner.on(", ").skipNulls().join(TermuxFileUtils.getUnExpandedTermuxPaths(TermuxWidgetService.SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST))) +
                     "\n" + context.getString(R.string.msg_icon_absolute_path, shortcutIconFilePath);
             Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
             return null;

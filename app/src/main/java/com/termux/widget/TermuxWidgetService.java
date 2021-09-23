@@ -17,6 +17,16 @@ import java.util.List;
 
 public final class TermuxWidgetService extends RemoteViewsService {
 
+    /* Allowed paths under which shortcut files can exist. */
+    public static final List<String> SHORTCUT_FILES_ALLOWED_PATHS_LIST = Arrays.asList(
+            TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR_PATH,
+            TermuxConstants.TERMUX_DATA_HOME_DIR_PATH);
+
+    /* Allowed paths under which shortcut icons files can exist. */
+    public static final List<String> SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST = Arrays.asList(
+            TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH,
+            TermuxConstants.TERMUX_DATA_HOME_DIR_PATH);
+
     public static final FileFilter SHORTCUT_FILES_FILTER = new FileFilter() {
         public boolean accept(File file) {
             // Do not show hidden files starting with a dot.
@@ -25,10 +35,10 @@ public final class TermuxWidgetService extends RemoteViewsService {
             // Do not show broken symlinks
             else if (!FileUtils.fileExists(file.getAbsolutePath(), true))
                 return false;
-            // Do not show files that are not under TermuxConstants#TERMUX_SHORTCUT_SCRIPTS_DIR_PATH
-            else if (!FileUtils.isPathInDirPath(file.getAbsolutePath(), TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR_PATH, true))
+            // Do not show files that are not under SHORTCUT_FILES_ALLOWED_PATHS_LIST
+            else if (!FileUtils.isPathInDirPaths(file.getAbsolutePath(), SHORTCUT_FILES_ALLOWED_PATHS_LIST, true))
                 return false;
-            // Do not show files under TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH
+            // Do not show files under TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH
             else if (TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR.equals(file.getParentFile()) &&
                     file.getName().equals(TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_BASENAME))
                 return false;

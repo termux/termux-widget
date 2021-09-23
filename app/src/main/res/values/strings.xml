@@ -37,10 +37,9 @@
     <string name="action_refresh">Refresh</string>
 
     <string name="error_null_or_empty_executable">The executable is null or empty.</string>
-    <string name="error_executable_not_under_shortcuts_directory">An executable can only be
-        executed if its under the &TERMUX_SHORTCUT_SCRIPTS_DIR_PATH_SHORT; directory.</string>
-    <string name="error_icon_not_under_shortcut_icons_directory">The icon is not under the
-        &TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH_SHORT; directory.</string>
+    <string name="error_executable_not_under_shortcuts_directories">An executable can only be
+        executed if its under the following directories: %1$s</string>
+    <string name="error_icon_not_under_shortcut_icons_directories">The icon is not under the following directories: %1$s</string>
     <string name="error_icon_not_a_regular_file">The icon file is not a regular file but is instead
         a \"%1$s\".</string>
     <string name="error_create_pinned_shortcut_failed">Failed to create pinned shortcut for \"%1$s\"</string>

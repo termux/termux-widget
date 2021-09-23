@@ -11,9 +11,11 @@ import android.view.Gravity;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.google.common.base.Joiner;
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.data.IntentUtils;
 import com.termux.shared.file.FileUtils;
+import com.termux.shared.file.TermuxFileUtils;
 import com.termux.shared.file.filesystem.FileType;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.models.ExecutionCommand;
@@ -181,9 +183,10 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         // Get canonical path of executable
         executionCommand.executable = FileUtils.getCanonicalPath(executionCommand.executable, null);
 
-        // If executable is not under TermuxConstants#TERMUX_SHORTCUT_SCRIPTS_DIR_PATH
-        if (!FileUtils.isPathInDirPath(executionCommand.executable, TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR_PATH, true)) {
-            errmsg = context.getString(R.string.error_executable_not_under_shortcuts_directory) +
+        // If executable is not under SHORTCUT_FILES_ALLOWED_PATHS_LIST
+        if (!FileUtils.isPathInDirPaths(executionCommand.executable, TermuxWidgetService.SHORTCUT_FILES_ALLOWED_PATHS_LIST, true)) {
+            errmsg = context.getString(R.string.error_executable_not_under_shortcuts_directories,
+                    Joiner.on(", ").skipNulls().join(TermuxFileUtils.getUnExpandedTermuxPaths(TermuxWidgetService.SHORTCUT_FILES_ALLOWED_PATHS_LIST))) +
                     "\n" + context.getString(R.string.msg_executable_absolute_path, executionCommand.executable);
             Logger.logErrorAndShowToast(context, logTag, errmsg);
             return;
