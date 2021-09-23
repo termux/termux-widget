@@ -10,7 +10,15 @@
 
 <resources>EXTRA_SHORTCUT_INTENT
     <string name="app_name">&TERMUX_WIDGET_APP_NAME;</string>
-    <string name="help">Visit %1$s for more info on plugin usage.</string>
+    <string name="plugin_info">&TERMUX_WIDGET_APP_NAME; is a plugin app for the &TERMUX_APP_NAME; app. Check &TERMUX_APP_NAME; app github %1$s and &TERMUX_WIDGET_APP_NAME; app github %2$s for more info.</string>
+    <string name="plugin_api_help">Visit %1$s for more info on plugin usage.</string>
+
+    <!-- TermuxWidgetActivity -->
+    <string name="msg_disable_launcher_icon_details">The &TERMUX_WIDGET_APP_NAME; app does not require
+        a require launcher icon/activity to function. You can optionally disable it if you want and
+        can enabled in again either by reinstalling the app or from the &TERMUX_APP_NAME; app settings
+        if the option has been implemented in your installed version."</string>
+
 
     <string name="title_widget">&TERMUX_APP_NAME;</string>
     <string name="title_shortcut_widget_name">&TERMUX_APP_NAME; widget</string>

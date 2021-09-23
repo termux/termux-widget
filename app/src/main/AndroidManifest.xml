@@ -25,7 +25,17 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/termux_appwidget_info" />
         </receiver>
+
         <receiver android:name=".TermuxWidgetControlExecutorReceiver" />
+
+        <activity
+            android:name=".activities.TermuxWidgetActivity"
+            android:theme="@style/Theme.MaterialComponents.DayNight.TermuxPrimaryActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".TermuxCreateShortcutActivity"
@@ -35,6 +45,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".TermuxLaunchShortcutActivity"
             android:noHistory="true"

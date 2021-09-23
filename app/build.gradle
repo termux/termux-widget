@@ -64,7 +64,8 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.10'
 
     implementation "androidx.annotation:annotation:1.2.0"
-    implementation 'com.termux.termux-app:termux-shared:4f66786b98'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.termux.termux-app:termux-shared:5e2bec0f4c'
 
     // Use if below libraries are published locally by termux-app with `./gradlew publishReleasePublicationToMavenLocal` and used with `mavenLocal()`.
     // If updates are done, republish there and sync project with gradle files here
