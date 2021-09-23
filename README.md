@@ -54,7 +54,7 @@ The `~/.shortcuts/` directory stores the scripts that can be run with the plugin
 
 The parent directory of the scripts must have read permission, otherwise the plugin will not be able to read the script files and will not show any scripts in the launcher widget and will give errors like `No regular file found at path` when executing launcher shortcuts. The parent directory of the script must also have executable permissions for the script to be allowed to execute.
 
-Files under hidden directories whose name starts with a dot `.`, broken symlinks or files whose canonical path is not under the `~/.shortcuts` directory are not shown in the widget and execution is not allowed for the later either.
+Files under hidden directories whose name starts with a dot `.`, broken symlinks or files whose canonical path is not under the `~/.shortcuts` or `~/.termux` directory are not shown in the widget and execution is not allowed for the later either.
 
 Open a non-root termux session and run the below commands to create the directories and give them read, write and executable permissions `(0700)`.
 
@@ -86,7 +86,7 @@ The `~/.shortcuts/icons` directory stores the icon that will be used for a scrip
 
 The parent directory of the icons must have read permission, otherwise the plugin will not be able to read them.
 
-The icon file must be a regular file and its canonical path must exist under `~/.shortcuts/icons` directory.
+The icon file must be a regular file and its canonical path must exist under `~/.shortcuts/icons` or `~/.termux` directory.
 
 Open a non-root termux session and run the below commands to create the directory and give it read and write permissions `(0600)`.
 
