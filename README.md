@@ -3,7 +3,7 @@
 [![Build status](https://github.com/termux/termux-widget/workflows/Build/badge.svg)](https://github.com/termux/termux-widget/actions)
 [![Join the chat at https://gitter.im/termux/termux](https://badges.gitter.im/termux/termux.svg)](https://gitter.im/termux/termux)
 
-A [Termux] plugin app adding shortcuts to commands on the home screen.
+A [Termux] plugin app to run scripts in Termux with launcher shortcuts and widgets.
 
 
 
