@@ -88,14 +88,16 @@ The parent directory of the icons must have read permission, otherwise the plugi
 
 The icon file must be a regular file and its canonical path must exist under `~/.shortcuts/icons` or `~/.termux` directory.
 
-Open a non-root termux session and run the below commands to create the directory and give it read and write permissions `(0600)`.
+Open a non-root termux session and run the below commands to create the directory and give it appropriate permissions.
 
 - Create `~/.shortcuts/icons` directory.
 
 ```
 mkdir -p /data/data/com.termux/files/home/.shortcuts/icons
-chmod 600 -R /data/data/com.termux/files/home/.shortcuts/icons
+chmod -R a-x,u=rwX,go-rwx /data/data/com.termux/files/home/.shortcuts/icons
 ```
+The `chmod` command will set the `icons` directory permissions to `0700`, but any files already in the directory will be set to `0600` which is recommended.
+
 
 #### `Draw Over Apps` permission (Optional)
 
