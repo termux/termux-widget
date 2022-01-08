@@ -56,6 +56,11 @@ android {
             }
         }
     }
+
+    packagingOptions {
+        // Remove terminal-emulator JNI libs added via termux-shared dependency
+        exclude 'lib/*/libtermux.so'
+    }
 }
 
 dependencies {
