@@ -21,13 +21,19 @@ A [Termux] plugin app to run scripts in Termux with launcher shortcuts and widge
 
 ### Installation
 
+Latest version is `v0.13.0`.
+
 Check [`termux-app` Installation](https://github.com/termux/termux-app#Installation) for details before reading forward.
 
 ### F-Droid
 
-`Termux:Widget` application can be obtained from `F-Droid` from [here](https://f-droid.org/en/packages/com.termux.widget/).
+`Termux:Widget` application can be obtained from `F-Droid` from [here](https://f-droid.org/en/packages/com.termux.widget).
 
 You **do not** need to download the `F-Droid` app (via the `Download F-Droid` link) to install `Termux:Widget`. You can download the `Termux:Widget` APK directly from the site by clicking the `Download APK` link at the bottom of each version section.
+
+It usually takes a few days (or even a week or more) for updates to be available on `F-Droid` once an update has been released on `Github`. The `F-Droid` releases are built and published by `F-Droid` once they [detect](https://gitlab.com/fdroid/fdroiddata/-/blob/master/metadata/com.termux.widget.yml) a new `Github` release. The Termux maintainers **do not** have any control over the building and publishing of the Termux apps on `F-Droid`. Moreover, the Termux maintainers also do not have access to the APK signing keys of `F-Droid` releases, so we cannot release an APK ourselves on `Github` that would be compatible with `F-Droid` releases.
+
+The `F-Droid` app often may not notify you of updates and you will manually have to do a pull down swipe action in the `Updates` tab of the app for it to check updates. Make sure battery optimizations are disabled for the app, check https://dontkillmyapp.com/ for details on how to do that.
 
 ### Github
 
@@ -35,7 +41,7 @@ You **do not** need to download the `F-Droid` app (via the `Download F-Droid` li
 
 The APKs for `Github Releases` will be listed under `Assets` drop-down of a release. These are automatically attached when a new version is released.
 
-The APKs for `Github Build` action workflows will be listed under `Artifacts` section of a workflow run. These are created for each commit/push done to the repository and can be used by users who don't want to wait for releases and want to try out the latest features immediately or want to test their pull requests.
+The APKs for `Github Build` action workflows will be listed under `Artifacts` section of a workflow run. These are created for each commit/push done to the repository and can be used by users who don't want to wait for releases and want to try out the latest features immediately or want to test their pull requests. Note that for action workflows, you need to be [**logged into a `Github` account**](https://github.com/login) for the `Artifacts` links to be enabled/clickable. If you are using the [`Github` app](https://github.com/mobile), then make sure to open workflow link in a browser like Chrome or Firefox that has your Github account logged in since the in-app browser may not be logged in.
 
 The APKs for both of these are [`debuggable`](https://developer.android.com/studio/debug) and are compatible with each other but they are not compatible with other sources.
 ##
@@ -127,7 +133,7 @@ You can help debug problems like how plugin shortcuts and scripts are being pars
 
 The plugin **does not execute the commands itself** but sends an execution intent to `Termux` app, which has its own log level which can be set in `Termux` app settings -> `Termux` -> `Debugging` -> `Log Level`. So you must set log level for both `Termux` and `Termux:Widget` app settings to get all the info.
 
-Once log levels have been set, you can run the `logcat` command in `Termux` app terminal to view the logs in realtime (`Ctrl+c` to stop) or use `logcat -d` to take a dump of the log. You can also view the logs from a PC over `ADB`. For more information, check official android `logcat` guide [here](https://developer.android.com/studio/command-line/logcat).
+Once log levels have been set, you can run the `logcat` command in `Termux` app terminal to view the logs in realtime (`Ctrl+c` to stop) or use `logcat -d > logcat.txt` to take a dump of the log. You can also view the logs from a PC over `ADB`. For more information, check official android `logcat` guide [here](https://developer.android.com/studio/command-line/logcat).
 
 ##### Log Levels
 
