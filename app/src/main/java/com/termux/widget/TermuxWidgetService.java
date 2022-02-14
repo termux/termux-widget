@@ -55,7 +55,7 @@ public final class TermuxWidgetService extends RemoteViewsService {
 
         public TermuxWidgetItem(File file, int depth) {
             this.mLabel = (depth > 0 ? (file.getParentFile().getName() + "/") : "")
-                    + file.getName().replace('-', ' ');
+                    + file.getName();
             this.mFile = file.getAbsolutePath();
         }
 
