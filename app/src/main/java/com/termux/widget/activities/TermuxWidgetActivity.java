@@ -144,7 +144,7 @@ public class TermuxWidgetActivity extends AppCompatActivity {
 
         List<ShortcutInfo> shortcuts = new ArrayList<>();
         for (ShortcutFile shortcutFile : shortcutFiles) {
-            shortcuts.add(shortcutFile.getShortcutInfo(context));
+            shortcuts.add(shortcutFile.getShortcutInfo(context, false));
         }
 
         // Remove shortcuts that can not be added.

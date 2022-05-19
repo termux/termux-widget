@@ -131,7 +131,7 @@ public class TermuxCreateShortcutActivity extends Activity {
 
         Logger.showToast(context, context.getString(R.string.msg_request_create_pinned_shortcut,
                 shortcutFile.getUnExpandedPath()), true);
-        shortcutManager.requestPinShortcut(shortcutFile.getShortcutInfo(context), null);
+        shortcutManager.requestPinShortcut(shortcutFile.getShortcutInfo(context, true), null);
     }
 
     private void createStaticShortcut(Context context, ShortcutFile shortcutFile) {

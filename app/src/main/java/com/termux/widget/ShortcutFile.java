@@ -93,13 +93,13 @@ public final class ShortcutFile {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N_MR1)
-    public ShortcutInfo getShortcutInfo(Context context) {
+    public ShortcutInfo getShortcutInfo(Context context, boolean showToastForIconUsed) {
         ShortcutInfo.Builder builder = new ShortcutInfo.Builder(context, getPath());
         builder.setIntent(getExecutionIntent(context));
         builder.setShortLabel(getLabel());
 
         // Set icon if existent.
-        File shortcutIconFile = getIconFile(context);
+        File shortcutIconFile = getIconFile(context, showToastForIconUsed);
         if (shortcutIconFile != null)
             builder.setIcon(Icon.createWithBitmap(((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap()));
         else
@@ -114,7 +114,7 @@ public final class ShortcutFile {
         intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, getLabel());
 
         // Set icon if existent.
-        File shortcutIconFile = getIconFile(context);
+        File shortcutIconFile = getIconFile(context, true);
         if (shortcutIconFile != null)
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, ((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap());
         else
@@ -138,7 +138,7 @@ public final class ShortcutFile {
     }
 
     @Nullable
-    private File getIconFile(Context context) {
+    private File getIconFile(Context context, boolean showToastForIconUsed) {
         String errmsg;
         String shortcutIconFilePath = TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +
                 "/" + ShellUtils.getExecutableBasename(getPath()) + ".png";
@@ -164,7 +164,9 @@ public final class ShortcutFile {
         }
 
         Logger.logInfo(LOG_TAG, "Using file at \"" + shortcutIconFilePath + "\" as shortcut icon file");
-        Logger.showToast(context, context.getString(R.string.msg_shortcut_icon_file_used, shortcutIconFilePath), true);
+        if (showToastForIconUsed) {
+            Logger.showToast(context, context.getString(R.string.msg_shortcut_icon_file_used, shortcutIconFilePath), true);
+        }
 
         return new File(shortcutIconFilePath);
     }
