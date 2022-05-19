@@ -86,9 +86,10 @@ Once you have created the directories, you can then create scripts files as per 
 
 Once you have created script files, you can add a launcher widget for the `Termux:Widget` app that will show the list of the script files, which you can execute by clicking them. If you create/modify shortcuts files, you will have to press the refresh button on the widget for the updated list to be shown. You can also refresh a specific widget by running `am broadcast -n com.termux.widget/.TermuxWidgetProvider -a com.termux.widget.ACTION_REFRESH_WIDGET --ei appWidgetId <id>` from Termux terminal/scripts for version `>= 0.13.0`, where `id` is the number in the `Termux shortcuts reloaded (<id>)` flash shown when you press the refresh button.
 
-You can also add a launcher shortcut for any script file with an optional custom icon as detailed in [Script Icon Directory](#script-icon-directory-optional).
+You can also add a launcher shortcut or dynamic shortcut for any script file with an optional custom icon as detailed in [Script Icon Directory](#script-icon-directory-optional).
 
 <img src="termux-widget.png" alt="" width="50%"/>
+
 
 #### Script Icon Directory (Optional)
 
@@ -109,7 +110,61 @@ chmod -R a-x,u=rwX,go-rwx /data/data/com.termux/files/home/.shortcuts/icons
 The `chmod` command will set the `icons` directory permissions to `0700`, but any files already in the directory will be set to `0600` which is recommended.
 
 
-#### `Draw Over Apps` permission (Optional)
+#### Dynamic Shortcuts (Optional)
+
+Dynamic shortcuts will normally show when long holding the `Termux:Widget` app launcher icon and in launcher searches results.
+
+To create dynamic shortcuts, put desired scripts/binaries in `~/.termux/widget/dynamic_shortcuts` with the Termux app and then click the `CREATE SHORTCUTS` button in the `Termux:Widget` app in the dynamic shortcuts section. To remove published dynamic shortcuts, click the `REMOVE SHORTCUTS` button but this won't remove dynamic shortcuts already converted to launcher shortcuts.
+
+For some launchers it might be necessary to regenerate the app shortcuts to display them correctly. Lookup the settings of your launcher to find such actions.
+
+
+#### Max Shortcuts Limit (Optional)
+
+Android has a limit on how many static and dynamic shortcuts can be created per app/activity, which is controlled by the [`max_shortcuts`](https://cs.android.com/android/platform/superproject/+/android-13.0.0_r8:frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java;l=254) sub key of the [`shortcut_manager_constants`](https://cs.android.com/android/platform/superproject/+/android-13.0.0_r8:frameworks/base/core/java/android/provider/Settings.java;l=13799) key in `global` settings namespace. The default value is [`5` on Android `>= 7.0`](https://cs.android.com/android/platform/superproject/+/android-7.0.0_r36:frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java;l=141), [`10` on Android `>= 10`](https://cs.android.com/android/platform/superproject/+/android-10.0.0_r1:frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java;l=165) and [`15` on Android `>= 11`](https://cs.android.com/android/platform/superproject/+/android-11.0.0_r9:frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java;l=172).
+
+To check `max_shortcuts` value currently being used by android `ShortcutService`, run:
+
+- `adb`: `adb shell "dumpsys shortcut | grep -E 'maxShortcutsPerActivity|mMaxDynamicShortcuts'"`
+
+- `root`: `su -c "dumpsys shortcut | grep -E 'maxShortcutsPerActivity|mMaxDynamicShortcuts'`
+
+To change the limit, check below.
+
+**Till Next Reboot**
+
+You can change the limit till next reboot with the [`cmd shortcut override-config`](https://cs.android.com/android/platform/superproject/+/android-13.0.0_r8:frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java;l=4943) command from an [`adb`] or [`root`] shell. For example to increase the limit to `25`, run:
+
+- `adb`: `adb shell "cmd shortcut override-config max_shortcuts=25"`
+
+- `root`: `su -c "cmd shortcut override-config max_shortcuts=25"`
+
+To reset to default, run `cmd shortcut override-config max_shortcuts=`
+
+**Permanently**
+
+You can change the limit permanently with the [`settings put global`](https://cs.android.com/android/platform/superproject/+/android-12.0.0_r34:frameworks/base/packages/SettingsProvider/src/com/android/providers/settings/SettingsService.java;l=465) command from an [`adb`] or [`root`] shell.
+
+The `max_shortcuts` sub key is stored in `settings` `global` namespace under a single `shortcut_manager_constants` key as a comma separated list of `key=value` pairs. You can check the current/default values set with:
+
+- `adb`: `adb shell "settings get global shortcut_manager_constants"`
+
+- `root`: `su -c "settings get global shortcut_manager_constants"`
+
+Now, since this is single key storing all the other sub keys, you can't just run `settings put` command to set a sub key value if the key value is already set, since it will overwrite all the existing values.
+
+You should first get the default/current, then update or append `,max_shortcuts=25` to it and then put the joint value back with `settings get global shortcut_manager_constants '<joint_value>'`.
+
+If the `shortcut_manager_constants` value is not set (by default it should be unset), then to increase the limit to `25` run:
+
+- `adb`: `adb shell "settings put global shortcut_manager_constants 'max_shortcuts=25'"`
+
+- `root`: `su -c "settings put global shortcut_manager_constants 'max_shortcuts=25'"`
+
+To reset to default if no other sub keys set, run `settings delete global shortcut_manager_constants`
+
+
+#### Draw Over Apps permission (Optional)
 
 For android `>= 10` there are new [restrictions](https://developer.android.com/guide/components/activities/background-starts) that prevent activities from starting from the background. This prevents the background `TermuxService` from starting a terminal session in the foreground and running the commands until the user manually clicks `Termux` notification in the status bar dropdown notifications list. This only affects plugin commands that are to be executed in a terminal session and not the background ones. `Termux` version `>= 0.100` requests the `Draw Over Apps` permission so that users can bypass this restriction so that commands can automatically start running without user intervention. You can grant `Termux` the `Draw Over Apps` permission from its `App Info` activity `Android Settings` -> `Apps` -> `Termux` -> `Advanced` -> `Draw over other apps`.
 ##
@@ -174,9 +229,11 @@ Check [Forking](https://github.com/termux/termux-app#Forking) section of `termux
 
 
 
+[`adb`]: https://developer.android.com/studio/command-line/adb
 [Termux]: https://termux.com
 [QuickEdit]: https://play.google.com/store/apps/details?id=com.rhmsoft.edit
 [QuickEdit Pro]: https://play.google.com/store/apps/details?id=com.rhmsoft.edit.pro
 [Acode editor]: https://github.com/deadlyjack/code-editor
 [Turbo Editor]: https://github.com/vmihalachi/turbo-editor
+[`root`]: https://topjohnwu.github.io/Magisk/tools.html#su
 [RUN_COMMAND Intent]: https://github.com/termux/termux-app/blob/master/app/src/main/java/com/termux/app/RunCommandService.java
