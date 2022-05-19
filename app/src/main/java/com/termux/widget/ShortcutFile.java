@@ -10,10 +10,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.widget.RemoteViews;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.google.common.base.Joiner;
+import com.termux.shared.data.DataUtils;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.file.TermuxFileUtils;
 import com.termux.shared.file.filesystem.FileType;
@@ -32,18 +34,57 @@ public final class ShortcutFile {
 
     private static final String LOG_TAG = "ShortcutFile";
 
-    public final File file;
-    public final String label;
+    public final String mPath;
+    public String mLabel;
 
-    public ShortcutFile(File file, int depth) {
-        this.file = file;
-        this.label = (depth > 0 ? (file.getParentFile().getName() + "/") : "")
-                + file.getName();
+    public ShortcutFile(@NonNull String path) {
+        this(path, null);
+    }
+
+    public ShortcutFile(@NonNull File file) {
+        this(file.getAbsolutePath(), null);
+    }
+
+    public ShortcutFile(@NonNull File file, int depth) {
+        this(file.getAbsolutePath(),
+                (depth > 0 && file.getParentFile() != null ? (file.getParentFile().getName() + "/") : "") + file.getName());
+    }
+
+    public ShortcutFile(@NonNull String path, @Nullable String defaultLabel) {
+        mPath = path;
+        mLabel = getLabelForShortcut(defaultLabel);
+    }
+
+    @NonNull
+    public String getPath() {
+        return mPath;
+    }
+
+    @NonNull
+    public String getCanonicalPath() {
+        return FileUtils.getCanonicalPath(getPath(), null);
+    }
+
+    @NonNull
+    public String getUnExpandedPath() {
+        return TermuxFileUtils.getUnExpandedTermuxPath(getCanonicalPath());
+    }
+
+    @NonNull
+    public String getLabel() {
+        return mLabel;
+    }
+
+    @NonNull
+    public String getLabelForShortcut(@Nullable String defaultLabel) {
+        if (!DataUtils.isNullOrEmpty(defaultLabel))
+            return defaultLabel;
+        else
+            return ShellUtils.getExecutableBasename(mPath);
     }
 
     public Intent getExecutionIntent(Context context) {
-        String path = file.getAbsolutePath();
-        Uri scriptUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(path).build();
+        Uri scriptUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(getPath()).build();
         Intent executionIntent = new Intent(context, TermuxLaunchShortcutActivity.class);
         executionIntent.setAction(TERMUX_SERVICE.ACTION_SERVICE_EXECUTE); // Mandatory for pinned shortcuts
         executionIntent.setData(scriptUri);
@@ -53,14 +94,12 @@ public final class ShortcutFile {
 
     @RequiresApi(api = Build.VERSION_CODES.N_MR1)
     public ShortcutInfo getShortcutInfo(Context context) {
-        String path = file.getAbsolutePath();
-
-        ShortcutInfo.Builder builder = new ShortcutInfo.Builder(context, path);
-        builder.setIntent(this.getExecutionIntent(context));
-        builder.setShortLabel(this.label);
+        ShortcutInfo.Builder builder = new ShortcutInfo.Builder(context, getPath());
+        builder.setIntent(getExecutionIntent(context));
+        builder.setShortLabel(getLabel());
 
         // Set icon if existent.
-        File shortcutIconFile = TermuxCreateShortcutActivity.getShortcutIconFile(context, ShellUtils.getExecutableBasename(path));
+        File shortcutIconFile = getIconFile(context);
         if (shortcutIconFile != null)
             builder.setIcon(Icon.createWithBitmap(((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap()));
         else
@@ -69,26 +108,40 @@ public final class ShortcutFile {
         return builder.build();
     }
 
+    public Intent getStaticShortcutIntent(Context context) {
+        Intent intent = new Intent();
+        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, getExecutionIntent(context));
+        intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, getLabel());
+
+        // Set icon if existent.
+        File shortcutIconFile = getIconFile(context);
+        if (shortcutIconFile != null)
+            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, ((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap());
+        else
+            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(context, R.drawable.ic_launcher));
+
+        return intent;
+    }
+
     public RemoteViews getListWidgetView(Context context) {
         // Position will always range from 0 to getCount() - 1.
         // Construct remote views item based on the item xml file and set text based on position.
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_item);
-        rv.setTextViewText(R.id.widget_item, this.label);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_item);
+        remoteViews.setTextViewText(R.id.widget_item, getLabel());
 
         // Next, we set a fill-intent which will be used to fill-in the pending intent template
         // which is set on the collection view in TermuxAppWidgetProvider.
-        Intent fillInIntent = new Intent().putExtra(TERMUX_WIDGET_PROVIDER.EXTRA_FILE_CLICKED, this.file.getAbsolutePath());
-        rv.setOnClickFillInIntent(R.id.widget_item_layout, fillInIntent);
+        Intent fillInIntent = new Intent().putExtra(TERMUX_WIDGET_PROVIDER.EXTRA_FILE_CLICKED, getPath());
+        remoteViews.setOnClickFillInIntent(R.id.widget_item_layout, fillInIntent);
 
-        return rv;
+        return remoteViews;
     }
 
     @Nullable
     private File getIconFile(Context context) {
         String errmsg;
-        String shortcutIconFilePath = FileUtils.getCanonicalPath(
-                TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +
-                "/" + ShellUtils.getExecutableBasename(file.getAbsolutePath()) + ".png", null);
+        String shortcutIconFilePath = TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +
+                "/" + ShellUtils.getExecutableBasename(getPath()) + ".png";
 
         FileType fileType = FileUtils.getFileType(shortcutIconFilePath, true);
         //  Ensure file or symlink points to a regular file that exists
