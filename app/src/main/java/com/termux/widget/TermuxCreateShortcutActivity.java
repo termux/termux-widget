@@ -31,6 +31,7 @@ import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
 import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET;
 import com.termux.shared.termux.TermuxUtils;
+import com.termux.widget.utils.ShortcutUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -77,7 +78,7 @@ public class TermuxCreateShortcutActivity extends Activity {
 
     private void updateListview(File directory) {
         mCurrentDirectory = directory;
-        mCurrentFiles = directory.listFiles(TermuxWidgetService.SHORTCUT_FILES_FILTER);
+        mCurrentFiles = directory.listFiles(ShortcutUtils.SHORTCUT_FILES_FILTER);
 
         if (mCurrentFiles == null) mCurrentFiles = new File[0];
 
@@ -207,9 +208,9 @@ public class TermuxCreateShortcutActivity extends Activity {
         }
 
         // Do not allow shortcut icons files not under SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST
-        if (!FileUtils.isPathInDirPaths(shortcutIconFilePath, TermuxWidgetService.SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST, true)) {
+        if (!FileUtils.isPathInDirPaths(shortcutIconFilePath, ShortcutUtils.SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST, true)) {
             errmsg = context.getString(R.string.error_icon_not_under_shortcut_icons_directories,
-                    Joiner.on(", ").skipNulls().join(TermuxFileUtils.getUnExpandedTermuxPaths(TermuxWidgetService.SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST))) +
+                    Joiner.on(", ").skipNulls().join(TermuxFileUtils.getUnExpandedTermuxPaths(ShortcutUtils.SHORTCUT_ICONS_FILES_ALLOWED_PATHS_LIST))) +
                     "\n" + context.getString(R.string.msg_icon_absolute_path, shortcutIconFilePath);
             Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
             return null;

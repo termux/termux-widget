@@ -27,6 +27,7 @@ import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
 import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET.TERMUX_WIDGET_PROVIDER;
 import com.termux.shared.termux.TermuxUtils;
+import com.termux.widget.utils.ShortcutUtils;
 
 import java.io.File;
 
@@ -184,9 +185,9 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         executionCommand.executable = FileUtils.getCanonicalPath(executionCommand.executable, null);
 
         // If executable is not under SHORTCUT_FILES_ALLOWED_PATHS_LIST
-        if (!FileUtils.isPathInDirPaths(executionCommand.executable, TermuxWidgetService.SHORTCUT_FILES_ALLOWED_PATHS_LIST, true)) {
+        if (!FileUtils.isPathInDirPaths(executionCommand.executable, ShortcutUtils.SHORTCUT_FILES_ALLOWED_PATHS_LIST, true)) {
             errmsg = context.getString(R.string.error_executable_not_under_shortcuts_directories,
-                    Joiner.on(", ").skipNulls().join(TermuxFileUtils.getUnExpandedTermuxPaths(TermuxWidgetService.SHORTCUT_FILES_ALLOWED_PATHS_LIST))) +
+                    Joiner.on(", ").skipNulls().join(TermuxFileUtils.getUnExpandedTermuxPaths(ShortcutUtils.SHORTCUT_FILES_ALLOWED_PATHS_LIST))) +
                     "\n" + context.getString(R.string.msg_executable_absolute_path, executionCommand.executable);
             Logger.logErrorAndShowToast(context, logTag, errmsg);
             return;

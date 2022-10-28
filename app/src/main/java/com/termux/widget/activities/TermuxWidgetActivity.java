@@ -6,12 +6,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
@@ -25,13 +21,10 @@ import com.termux.shared.models.errors.Error;
 import com.termux.shared.packages.PackageUtils;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.widget.R;
-import com.termux.shared.shell.ShellUtils;
-import com.termux.widget.TermuxWidgetService;
-import com.termux.widget.TermuxCreateShortcutActivity;
-import com.termux.widget.NaturalOrderComparator;
+import com.termux.widget.ShortcutFile;
+import com.termux.widget.utils.ShortcutUtils;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -128,36 +121,6 @@ public class TermuxWidgetActivity extends AppCompatActivity {
         return shortcutManager;
     }
 
-    private static void enumerateShortcutFiles(List<TermuxWidgetService.TermuxWidgetItem> items, File dir, boolean sorted) {
-        enumerateShortcutFiles(items, dir, sorted, 0);
-    }
-
-    private static void enumerateShortcutFiles(List<TermuxWidgetService.TermuxWidgetItem> items, File dir, boolean sorted, int depth) {
-        if (depth > 5) return;
-
-        File[] files = dir.listFiles(TermuxWidgetService.SHORTCUT_FILES_FILTER);
-
-        if (files == null) return;
-
-        if (sorted) {
-            Arrays.sort(files, (lhs, rhs) -> {
-                if (lhs.isDirectory() != rhs.isDirectory()) {
-                    return lhs.isDirectory() ? 1 : -1;
-                }
-                return NaturalOrderComparator.compare(lhs.getName(), rhs.getName());
-            });
-        }
-
-        for (File file : files) {
-            if (file.isDirectory()) {
-                enumerateShortcutFiles(items, file, sorted, depth + 1);
-            } else {
-                items.add(new TermuxWidgetService.TermuxWidgetItem(file, depth));
-            }
-        }
-
-    }
-
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private void createDynamicShortcuts(@NonNull Context context) {
         ShortcutManager shortcutManager = getShortcutManager(context, true);
@@ -170,33 +133,23 @@ public class TermuxWidgetActivity extends AppCompatActivity {
             Logger.showToast(this, Error.getMinimalErrorLogString(error), true);
         }
 
-        List<TermuxWidgetService.TermuxWidgetItem> items = new ArrayList<>();
-        enumerateShortcutFiles(items, new File(TERMUX_WIDGET_DYNAMIC_SHORTCUTS_DIR_PATH), false);
+        List<ShortcutFile> shortcutFiles = new ArrayList<>();
+        ShortcutUtils.enumerateShortcutFiles(shortcutFiles, new File(TERMUX_WIDGET_DYNAMIC_SHORTCUTS_DIR_PATH), false);
 
-        if (items.size() == 0) {
+        if (shortcutFiles.size() == 0) {
             Logger.showToast(context, getString(R.string.msg_no_shortcut_files_found_in_directory,
                     TermuxFileUtils.getUnExpandedTermuxPath(TERMUX_WIDGET_DYNAMIC_SHORTCUTS_DIR_PATH)), true);
             return;
         }
 
         List<ShortcutInfo> shortcuts = new ArrayList<>();
-        for (TermuxWidgetService.TermuxWidgetItem item : items) {
-            ShortcutInfo.Builder builder = new ShortcutInfo.Builder(context, item.mFile);
-            builder.setIntent(TermuxCreateShortcutActivity.getExecutionIntent(context, item.mFile));
-            builder.setShortLabel(item.mLabel);
-
-            File shortcutIconFile = TermuxCreateShortcutActivity.getShortcutIconFile(context, ShellUtils.getExecutableBasename(item.mFile));
-            if (shortcutIconFile != null)
-                builder.setIcon(Icon.createWithBitmap(((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap()));
-            else
-                builder.setIcon(Icon.createWithResource(context, R.drawable.ic_launcher));
-
-            shortcuts.add(builder.build());
+        for (ShortcutFile shortcutFile : shortcutFiles) {
+            shortcuts.add(shortcutFile.getShortcutInfo(context));
         }
 
         // Remove shortcuts that can not be added.
         int maxShortcuts = shortcutManager.getMaxShortcutCountPerActivity();
-        Logger.logDebug(LOG_TAG, "Found " + items.size() + " shortcuts and max shortcuts limit is " + maxShortcuts);
+        Logger.logDebug(LOG_TAG, "Found " + shortcutFiles.size() + " shortcuts and max shortcuts limit is " + maxShortcuts);
         if (shortcuts.size() > maxShortcuts) {
             Logger.logErrorAndShowToast(context, LOG_TAG, getString(R.string.msg_dynamic_shortcuts_limit_reached, maxShortcuts));
             while (shortcuts.size() > maxShortcuts) {

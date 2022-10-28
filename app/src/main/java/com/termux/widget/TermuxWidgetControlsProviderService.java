@@ -18,6 +18,7 @@ import com.termux.shared.settings.preferences.TermuxWidgetAppSharedPreferences;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
 import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET;
+import com.termux.widget.utils.ShortcutUtils;
 
 import org.reactivestreams.FlowAdapters;
 
@@ -248,7 +249,7 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
             // max depth defined from TermuxWidgetService so using same here
             return;
         }
-        File[] files = dir.listFiles(TermuxWidgetService.SHORTCUT_FILES_FILTER);
+        File[] files = dir.listFiles(ShortcutUtils.SHORTCUT_FILES_FILTER);
 
         if (files == null) {
             return;
