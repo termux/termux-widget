@@ -147,10 +147,10 @@ public class TermuxCreateShortcutActivity extends Activity {
         String shortcutFileName = ShellUtils.getExecutableBasename(shortcutFilePath);
 
         ShortcutInfo.Builder builder = new ShortcutInfo.Builder(context, shortcutFilePath);
-        builder.setIntent(getExecutionIntent(context, shortcutFilePath));
+        builder.setIntent(TermuxCreateShortcutActivity.getExecutionIntent(context, shortcutFilePath));
         builder.setShortLabel(shortcutFileName);
 
-        File shortcutIconFile = getShortcutIconFile(context, shortcutFileName);
+        File shortcutIconFile = TermuxCreateShortcutActivity.getShortcutIconFile(context, shortcutFileName);
         if (shortcutIconFile != null)
             builder.setIcon(Icon.createWithBitmap(((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap()));
         else
@@ -165,10 +165,10 @@ public class TermuxCreateShortcutActivity extends Activity {
         String shortcutFileName = ShellUtils.getExecutableBasename(shortcutFilePath);
 
         Intent intent = new Intent();
-        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, getExecutionIntent(context, shortcutFilePath));
+        intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, TermuxCreateShortcutActivity.getExecutionIntent(context, shortcutFilePath));
         intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, shortcutFileName);
 
-        File shortcutIconFile = getShortcutIconFile(context, shortcutFileName);
+        File shortcutIconFile = TermuxCreateShortcutActivity.getShortcutIconFile(context, shortcutFileName);
         if (shortcutIconFile != null)
             intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, ((BitmapDrawable) Drawable.createFromPath(shortcutIconFile.getAbsolutePath())).getBitmap());
         else
@@ -179,7 +179,7 @@ public class TermuxCreateShortcutActivity extends Activity {
         setResult(RESULT_OK, intent);
     }
 
-    private Intent getExecutionIntent(Context context, String shortcutFilePath) {
+    public static Intent getExecutionIntent(Context context, String shortcutFilePath) {
         Uri scriptUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(shortcutFilePath).build();
         Intent executionIntent = new Intent(context, TermuxLaunchShortcutActivity.class);
         executionIntent.setAction(TERMUX_SERVICE.ACTION_SERVICE_EXECUTE); // Mandatory for pinned shortcuts
@@ -189,7 +189,7 @@ public class TermuxCreateShortcutActivity extends Activity {
     }
 
     @Nullable
-    private File getShortcutIconFile(Context context, String shortcutFileName) {
+    public static File getShortcutIconFile(Context context, String shortcutFileName) {
         String errmsg;
         String shortcutIconFilePath = FileUtils.getCanonicalPath(
                 TermuxConstants.TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH +

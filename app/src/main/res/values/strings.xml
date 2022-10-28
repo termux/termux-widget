@@ -10,14 +10,33 @@
 
 <resources>EXTRA_SHORTCUT_INTENT
     <string name="app_name">&TERMUX_WIDGET_APP_NAME;</string>
-    <string name="plugin_info">&TERMUX_WIDGET_APP_NAME; is a plugin app for the &TERMUX_APP_NAME; app. Check &TERMUX_APP_NAME; app github %1$s and &TERMUX_WIDGET_APP_NAME; app github %2$s for more info.</string>
+    <string name="plugin_info">&TERMUX_WIDGET_APP_NAME; is a plugin app for the &TERMUX_APP_NAME; app.
+        \n\nCheck &TERMUX_APP_NAME; app github %1$s and &TERMUX_WIDGET_APP_NAME; app github %2$s for more info.</string>
     <string name="plugin_api_help">Visit %1$s for more info on plugin usage.</string>
 
     <!-- TermuxWidgetActivity -->
-    <string name="msg_disable_launcher_icon_details">The &TERMUX_WIDGET_APP_NAME; app does not require
+    <string name="msg_disable_launcher_icon_info">The &TERMUX_WIDGET_APP_NAME; app does not require
         a require launcher icon/activity to function. You can optionally disable it if you want and
         can enabled in again either by reinstalling the app or from the &TERMUX_APP_NAME; app settings
         if the option has been implemented in your installed version."</string>
+
+    <string name="msg_max_shortcuts_limit_info">The current max static and dynamic shortcuts limit
+        for the &TERMUX_WIDGET_APP_NAME; app is %1$d.
+        \n\nCheck %2$s for info on how to change the limit."</string>
+
+    <string name="msg_dynamic_shortcuts_info">Dynamic shortcuts will normally show when long
+        holding the &TERMUX_WIDGET_APP_NAME; app launcher icon and in launcher searches results.
+        To create dynamic shortcuts, put desired scripts/binaries in `%1$s` with the &TERMUX_APP_NAME;
+        app and then click the create shortcuts button."</string>
+    <string name="action_create_dynamic_shortcuts">Create Shortcuts</string>
+    <string name="action_remove_dynamic_shortcuts">Remove Shortcuts</string>
+    <string name="msg_created_dynamic_shortcuts_successfully">Created %1$d dynamic shortcuts successfully</string>
+    <string name="msg_removed_dynamic_shortcuts_successfully">Removed dynamic shortcuts successfully</string>
+    <string name="msg_no_shortcut_files_found_in_directory">No shortcut files found in `%1$s`</string>
+    <string name="msg_no_dynamic_shortcuts_currently_created">No dynamic shortcuts currently created</string>
+    <string name="msg_dynamic_shortcuts_limit_reached">Only %1$d shortcuts allowed. Check
+        &TERMUX_WIDGET_APP_NAME; github for how to increase limit</string>
+    <string name="msg_skipping_shortcut">Skipping shortcut `%1$s`</string>
 
 
     <string name="title_widget">&TERMUX_APP_NAME;</string>
