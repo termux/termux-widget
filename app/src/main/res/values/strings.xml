@@ -42,6 +42,14 @@
 
     <!-- ShortcutFile -->
     <string name="msg_shortcut_icon_file_used">Using file at `%1$s` as shortcut icon file</string>
+
+
+
+    <!-- ShortcutUtils -->
+    <string name="error_failed_to_get_shortcut_manager">Failed to get ShortcutManager</string>
+
+
+
     <string name="title_widget">&TERMUX_APP_NAME;</string>
     <string name="title_shortcut_widget_name">&TERMUX_APP_NAME; widget</string>
     <string name="title_single_shortcut_name">&TERMUX_APP_NAME; shortcut</string>

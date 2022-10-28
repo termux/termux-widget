@@ -1,8 +1,17 @@
 package com.termux.widget.utils;
 
+import android.content.Context;
+import android.content.pm.ShortcutManager;
+import android.os.Build;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
 import com.termux.shared.file.FileUtils;
+import com.termux.shared.logger.Logger;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.widget.NaturalOrderComparator;
+import com.termux.widget.R;
 import com.termux.widget.ShortcutFile;
 
 import java.io.File;
@@ -75,6 +84,16 @@ public class ShortcutUtils {
                 files.add(new ShortcutFile(file, depth));
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N_MR1)
+    public static ShortcutManager getShortcutManager(@NonNull Context context, @NonNull String logTag, boolean showErrorToast) {
+        ShortcutManager shortcutManager = (ShortcutManager) context.getSystemService(Context.SHORTCUT_SERVICE);
+        if (shortcutManager == null)  {
+            Logger.logErrorAndShowToast(showErrorToast ? context : null, logTag, context.getString(R.string.error_failed_to_get_shortcut_manager));
+            return null;
+        }
+        return shortcutManager;
     }
 
 }

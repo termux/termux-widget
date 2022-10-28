@@ -103,7 +103,7 @@ public class TermuxCreateShortcutActivity extends Activity {
     private void createShortcut(Context context, File clickedFile) {
         boolean isPinnedShortcutSupported = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            ShortcutManager shortcutManager = (ShortcutManager) context.getSystemService(Context.SHORTCUT_SERVICE);
+            ShortcutManager shortcutManager = ShortcutUtils.getShortcutManager(context, LOG_TAG, true);
             if (shortcutManager != null && shortcutManager.isRequestPinShortcutSupported())
                 isPinnedShortcutSupported = true;
         }
@@ -126,7 +126,7 @@ public class TermuxCreateShortcutActivity extends Activity {
 
     @TargetApi(Build.VERSION_CODES.O)
     private void createPinnedShortcut(Context context, ShortcutFile shortcutFile) {
-        ShortcutManager shortcutManager = (ShortcutManager) context.getSystemService(Context.SHORTCUT_SERVICE);
+        ShortcutManager shortcutManager = ShortcutUtils.getShortcutManager(context, LOG_TAG, true);
         if (shortcutManager == null) return;
 
         Logger.showToast(context, context.getString(R.string.msg_request_create_pinned_shortcut,

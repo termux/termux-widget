@@ -70,7 +70,7 @@ public class TermuxWidgetActivity extends AppCompatActivity {
         LinearLayout maxShortcutsInfoLinearLayout = findViewById(R.id.linearlayout_max_shortcuts_limit_info);
         maxShortcutsInfoLinearLayout.setVisibility(View.GONE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            ShortcutManager shortcutManager = getShortcutManager(this, true);
+            ShortcutManager shortcutManager = ShortcutUtils.getShortcutManager(this, LOG_TAG, true);
             TextView maxShortcutsInfoTextView = findViewById(R.id.textview_max_shortcuts_limit_info);
             if (shortcutManager != null) {
                 maxShortcutsInfoLinearLayout.setVisibility(View.VISIBLE);
@@ -111,19 +111,9 @@ public class TermuxWidgetActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N_MR1)
-    public static ShortcutManager getShortcutManager(@NonNull Context context, boolean showToast) {
-        ShortcutManager shortcutManager = (ShortcutManager) context.getSystemService(Context.SHORTCUT_SERVICE);
-        if (shortcutManager == null)  {
-            Logger.logErrorAndShowToast(showToast ? context : null, LOG_TAG, "Failed to get shortcut manager");
-            return null;
-        }
-        return shortcutManager;
-    }
-
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private void createDynamicShortcuts(@NonNull Context context) {
-        ShortcutManager shortcutManager = getShortcutManager(context, true);
+        ShortcutManager shortcutManager = ShortcutUtils.getShortcutManager(context, LOG_TAG, true);
         if (shortcutManager == null) return;
 
         // Create directory if necessary so user more easily finds where to put shortcuts
@@ -169,7 +159,7 @@ public class TermuxWidgetActivity extends AppCompatActivity {
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private void removeDynamicShortcuts(@NonNull Context context) {
-        ShortcutManager shortcutManager = getShortcutManager(context, true);
+        ShortcutManager shortcutManager = ShortcutUtils.getShortcutManager(context, LOG_TAG, true);
         if (shortcutManager == null) return;
 
         List<ShortcutInfo> shortcuts = shortcutManager.getDynamicShortcuts();
