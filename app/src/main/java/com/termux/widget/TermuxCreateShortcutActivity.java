@@ -1,6 +1,5 @@
 package com.termux.widget;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -10,6 +9,8 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import androidx.annotation.RequiresApi;
 
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.logger.Logger;
@@ -111,7 +112,7 @@ public class TermuxCreateShortcutActivity extends Activity {
         ShortcutFile shortcutFile = new ShortcutFile(clickedFile);
 
         try {
-            if (isPinnedShortcutSupported)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isPinnedShortcutSupported)
                 createPinnedShortcut(context, shortcutFile);
             else
                 createStaticShortcut(context, shortcutFile);
@@ -124,7 +125,7 @@ public class TermuxCreateShortcutActivity extends Activity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void createPinnedShortcut(Context context, ShortcutFile shortcutFile) {
         ShortcutManager shortcutManager = ShortcutUtils.getShortcutManager(context, LOG_TAG, true);
         if (shortcutManager == null) return;

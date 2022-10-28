@@ -1,6 +1,5 @@
 package com.termux.widget;
 
-import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.drawable.Icon;
@@ -13,6 +12,8 @@ import android.service.controls.actions.CommandAction;
 import android.service.controls.actions.ControlAction;
 import android.service.controls.templates.ControlTemplate;
 import android.service.controls.templates.StatelessTemplate;
+
+import androidx.annotation.RequiresApi;
 
 import com.termux.shared.settings.preferences.TermuxWidgetAppSharedPreferences;
 import com.termux.shared.termux.TermuxConstants;
@@ -38,7 +39,7 @@ import io.reactivex.processors.ReplayProcessor;
  * See:
  * https://developer.android.com/guide/topics/ui/device-control
  */
-@TargetApi(Build.VERSION_CODES.R)
+@RequiresApi(api = Build.VERSION_CODES.R)
 public class TermuxWidgetControlsProviderService extends ControlsProviderService {
 
     private static final int WIDGET_REQUEST_CODE = 2233;
