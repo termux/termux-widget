@@ -49,6 +49,8 @@
         <activity
             android:name=".TermuxLaunchShortcutActivity"
             android:noHistory="true"
+            android:launchMode="singleInstance"
+            android:taskAffinity=".TermuxLaunchShortcutActivity"
             android:theme="@android:style/Theme.NoDisplay"
             android:exported="true"/>
 
