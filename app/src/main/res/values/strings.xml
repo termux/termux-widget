@@ -38,6 +38,12 @@
         &TERMUX_WIDGET_APP_NAME; github for how to increase limit</string>
     <string name="msg_skipping_shortcut">Skipping shortcut `%1$s`</string>
 
+    <string name="msg_refresh_all_widgets_info">To manually refresh all widgets to show updated
+        shortcuts, click the refresh button.
+        \n\nThis may also be needed in some cases after app updates where widgets become non-responsive
+        and do not show any shortcuts and refresh buttons of the widgets itself do not work either.</string>
+    <string name="action_refresh_all_widgets">Refresh</string>
+
 
 
     <!-- ShortcutFile -->
@@ -55,7 +61,8 @@
     <string name="title_single_shortcut_name">&TERMUX_APP_NAME; shortcut</string>
     <string name="title_termux_shortcuts">&TERMUX_APP_NAME; Shortcuts</string>
 
-    <string name="msg_scripts_reloaded">&TERMUX_APP_NAME; shortcuts reloaded (%1$d)</string>
+    <string name="msg_widgets_reloaded">&TERMUX_APP_NAME; widgets reloaded: %1$s</string>
+    <string name="msg_no_widgets_found_to_reload">No &TERMUX_APP_NAME; widgets found to reload</string>
     <string name="msg_no_shortcut_scripts">No files in\n&TERMUX_SHORTCUT_SCRIPTS_DIR_PATH_SHORT;</string>
     <string name="msg_bad_token">This shortcut is invalid - remove and add again.</string>
     <string name="msg_executing_task">Executing task: \"%1$s\"</string>

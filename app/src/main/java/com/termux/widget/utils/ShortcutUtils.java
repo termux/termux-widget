@@ -10,6 +10,7 @@ import androidx.annotation.RequiresApi;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.TermuxUtils;
 import com.termux.widget.NaturalOrderComparator;
 import com.termux.widget.R;
 import com.termux.widget.ShortcutFile;
@@ -94,6 +95,15 @@ public class ShortcutUtils {
             return null;
         }
         return shortcutManager;
+    }
+
+    public static boolean isTermuxAppAccessible(@NonNull Context context, @NonNull String logTag, boolean showErrorToast) {
+        String errmsg = TermuxUtils.isTermuxAppAccessible(context);
+        if (errmsg != null) {
+            Logger.logErrorAndShowToast(showErrorToast ? context : null, logTag, errmsg);
+            return false;
+        }
+        return true;
     }
 
 }

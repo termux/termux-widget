@@ -1,8 +1,10 @@
 package com.termux.widget;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,6 +12,8 @@ import android.os.Build;
 import android.view.Gravity;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.google.common.base.Joiner;
 import com.termux.shared.data.DataUtils;
@@ -30,6 +34,9 @@ import com.termux.shared.termux.TermuxUtils;
 import com.termux.widget.utils.ShortcutUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Widget providing a list to launch scripts in ~/.shortcuts/.
@@ -41,6 +48,8 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
     private static final String LOG_TAG = "TermuxWidgetProvider";
 
     public void onEnabled(Context context) {
+        Logger.logDebug(LOG_TAG, "onEnabled");
+
         String errmsg = TermuxUtils.isTermuxAppAccessible(context);
         if (errmsg != null) {
             Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
@@ -58,76 +67,165 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
      */
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
+
+        Logger.logDebug(LOG_TAG, "onUpdate: " + Arrays.toString(appWidgetIds));
+        if (appWidgetIds == null || appWidgetIds.length == 0) return;
+
         for (int appWidgetId : appWidgetIds) {
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-
-            // The empty view is displayed when the collection has no items. It should be a sibling
-            // of the collection view:
-            rv.setEmptyView(R.id.widget_list, R.id.empty_view);
-
-            // Setup intent which points to the TermuxWidgetService which will provide the views for this collection.
-            Intent intent = new Intent(context, TermuxWidgetService.class);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            // When intents are compared, the extras are ignored, so we need to embed the extras
-            // into the data so that the extras will not be ignored.
-            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-            rv.setRemoteAdapter(R.id.widget_list, intent);
-
-            // Setup refresh button:
-            Intent refreshIntent = new Intent(context, TermuxWidgetProvider.class);
-            refreshIntent.setAction(TERMUX_WIDGET_PROVIDER.ACTION_REFRESH_WIDGET);
-            refreshIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            refreshIntent.setData(Uri.parse(refreshIntent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent refreshPendingIntent = PendingIntent.getBroadcast(context, 0, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            rv.setOnClickPendingIntent(R.id.refresh_button, refreshPendingIntent);
-
-            // Here we setup the a pending intent template. Individuals items of a collection
-            // cannot setup their own pending intents, instead, the collection as a whole can
-            // setup a pending intent template, and the individual items can set a fillInIntent
-            // to create unique before on an item to item basis.
-            Intent toastIntent = new Intent(context, TermuxWidgetProvider.class);
-            toastIntent.setAction(TERMUX_WIDGET_PROVIDER.ACTION_WIDGET_ITEM_CLICKED);
-            toastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent toastPendingIntent = PendingIntent.getBroadcast(context, 0, toastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            rv.setPendingIntentTemplate(R.id.widget_list, toastPendingIntent);
-
-            appWidgetManager.updateAppWidget(appWidgetId, rv);
+            updateAppWidgetRemoteViews(context, appWidgetManager, appWidgetId);
         }
+    }
+
+    public static void updateAppWidgetRemoteViews(@NonNull Context context, @NonNull AppWidgetManager appWidgetManager, int appWidgetId) {
+        if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) return;
+
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+
+        // The empty view is displayed when the collection has no items. It should be a sibling
+        // of the collection view:
+        remoteViews.setEmptyView(R.id.widget_list, R.id.empty_view);
+
+        // Setup intent which points to the TermuxWidgetService which will provide the views for this collection.
+        Intent intent = new Intent(context, TermuxWidgetService.class);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        // When intents are compared, the extras are ignored, so we need to embed the extras
+        // into the data so that the extras will not be ignored.
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+        remoteViews.setRemoteAdapter(R.id.widget_list, intent);
+
+        // Setup refresh button:
+        Intent refreshIntent = new Intent(context, TermuxWidgetProvider.class);
+        refreshIntent.setAction(TERMUX_WIDGET_PROVIDER.ACTION_REFRESH_WIDGET);
+        refreshIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        refreshIntent.setData(Uri.parse(refreshIntent.toUri(Intent.URI_INTENT_SCHEME)));
+        @SuppressLint("UnspecifiedImmutableFlag") // Must be mutable
+        PendingIntent refreshPendingIntent = PendingIntent.getBroadcast(context, 0, refreshIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.refresh_button, refreshPendingIntent);
+
+        // Here we setup the a pending intent template. Individuals items of a collection
+        // cannot setup their own pending intents, instead, the collection as a whole can
+        // setup a pending intent template, and the individual items can set a fillInIntent
+        // to create unique before on an item to item basis.
+        Intent toastIntent = new Intent(context, TermuxWidgetProvider.class);
+        toastIntent.setAction(TERMUX_WIDGET_PROVIDER.ACTION_WIDGET_ITEM_CLICKED);
+        toastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+        @SuppressLint("UnspecifiedImmutableFlag") // Must be mutable
+        PendingIntent toastPendingIntent = PendingIntent.getBroadcast(context, 0, toastIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setPendingIntentTemplate(R.id.widget_list, toastPendingIntent);
+
+        appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+    }
+
+    @Override
+    public void onDeleted(Context context, int[] appWidgetIds) {
+        Logger.logDebug(LOG_TAG, "onDeleted");
+    }
+
+    @Override
+    public void onDisabled(Context context) {
+        Logger.logDebug(LOG_TAG, "onDisabled");
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
+        String action = intent != null ? intent.getAction() : null;
+        if (action == null) return;
 
-        switch (intent.getAction()) {
-            case TERMUX_WIDGET_PROVIDER.ACTION_WIDGET_ITEM_CLICKED:
+        Logger.logDebug(LOG_TAG, "onReceive(): " + action);
+        Logger.logVerbose(LOG_TAG, "Intent Received\n" + IntentUtils.getIntentString(intent));
+
+        switch (action) {
+            case AppWidgetManager.ACTION_APPWIDGET_UPDATE: {
+                // The super class already handles this to call onUpdate to update remove views, but
+                // we handle this ourselves and call notifyAppWidgetViewDataChanged as well afterwards.
+                if (!ShortcutUtils.isTermuxAppAccessible(context, LOG_TAG, false)) return;
+
+                refreshAppWidgets(context, intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS), true);
+
+                return;
+            } case TERMUX_WIDGET_PROVIDER.ACTION_WIDGET_ITEM_CLICKED: {
                 String clickedFilePath = intent.getStringExtra(TERMUX_WIDGET_PROVIDER.EXTRA_FILE_CLICKED);
-                if (FileUtils.getFileType(clickedFilePath, true) == FileType.DIRECTORY) return;
-                sendExecutionIntentToTermuxService(context, clickedFilePath, LOG_TAG);
-                break;
-            case TERMUX_WIDGET_PROVIDER.ACTION_REFRESH_WIDGET:
-                String errmsg = TermuxUtils.isTermuxAppAccessible(context);
-                if (errmsg != null) {
-                    Logger.logErrorAndShowToast(context, LOG_TAG, errmsg);
+                if (clickedFilePath == null || clickedFilePath.isEmpty()) {
+                    Logger.logError(LOG_TAG, "Ignoring unset clicked file");
                     return;
                 }
 
-                int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-                if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) return;
-                AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
+                if (FileUtils.getFileType(clickedFilePath, true) == FileType.DIRECTORY) {
+                    Logger.logError(LOG_TAG, "Ignoring clicked directory file");
+                    return;
+                }
+                
+                sendExecutionIntentToTermuxService(context, clickedFilePath, LOG_TAG);
+                return;
 
-                Toast toast = Toast.makeText(context, context.getString(R.string.msg_scripts_reloaded, appWidgetId), Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
+            } case TERMUX_WIDGET_PROVIDER.ACTION_REFRESH_WIDGET: {
+                if (!ShortcutUtils.isTermuxAppAccessible(context, LOG_TAG, true)) return;
+
+                int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+                int[] appWidgetIds;
+                boolean updateRemoteViews = false;
+                if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    appWidgetIds = new int[]{appWidgetId};
+                } else {
+                    appWidgetIds = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, TermuxWidgetProvider.class));
+                    Logger.logDebug(LOG_TAG, "Refreshing all widget ids: " + Arrays.toString(appWidgetIds));
+
+                    // Only update remote views if sendIntentToRefreshAllWidgets() is called or if
+                    // user sent intent with "am broadcast" command.
+                    // A valid id would normally only be sent if refresh button of widget was successfully
+                    // pressed and widget was not in a non-responsive state, so no need to update remote views.
+                    updateRemoteViews = true;
+                }
+
+                List<Integer> updatedAppWidgetIds = refreshAppWidgets(context, appWidgetIds, updateRemoteViews);
+                if (updatedAppWidgetIds != null)
+                    Logger.logDebugAndShowToast(context, LOG_TAG, context.getString(R.string.msg_widgets_reloaded, Arrays.toString(appWidgetIds)));
+                else
+                    Logger.logDebugAndShowToast(context, LOG_TAG, context.getString(R.string.msg_no_widgets_found_to_reload));
+                return;
+
+            } default: {
+                Logger.logDebug(LOG_TAG, "Unhandled action: " + action);
                 break;
+
+            }
         }
+
+        // Allow super to handle other actions
+        super.onReceive(context, intent);
     }
 
+    public static List<Integer> refreshAppWidgets(@NonNull Context context, int[] appWidgetIds, boolean updateRemoteViews) {
+        if (appWidgetIds == null || appWidgetIds.length == 0) return null;
+        List<Integer> updatedAppWidgetIds = new ArrayList<>();
+        for (int appWidgetId : appWidgetIds) {
+            if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) continue;
+            updatedAppWidgetIds.add(appWidgetId);
+            if (updateRemoteViews)
+                updateAppWidgetRemoteViews(context, AppWidgetManager.getInstance(context), appWidgetId);
 
+            AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, R.id.widget_list);
+        }
 
+        return updatedAppWidgetIds.size() > 0 ? updatedAppWidgetIds : null;
+    }
 
-
+    public static void sendIntentToRefreshAllWidgets(@NonNull Context context, @NonNull String logTag) {
+        Intent intent = new Intent(TERMUX_WIDGET_PROVIDER.ACTION_REFRESH_WIDGET);
+        intent.setClass(context, TermuxWidgetProvider.class);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        try {
+            Logger.logDebug(logTag, "Sending intent to refresh all widgets");
+            context.sendBroadcast(intent);
+        } catch (Exception e) {
+            Logger.showToast(context, e.getMessage(), true);
+            Logger.logStackTraceWithMessage(LOG_TAG, "Failed to send intent to refresh all widgets", e);
+        }
+    }
 
     /**
      * Extract termux shortcut file path from an intent and send intent to TermuxService to execute it.

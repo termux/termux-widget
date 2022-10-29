@@ -22,6 +22,7 @@ import com.termux.shared.packages.PackageUtils;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.widget.R;
 import com.termux.widget.ShortcutFile;
+import com.termux.widget.TermuxWidgetProvider;
 import com.termux.widget.utils.ShortcutUtils;
 
 import java.io.File;
@@ -55,6 +56,7 @@ public class TermuxWidgetActivity extends AppCompatActivity {
 
         setDisableLauncherIconViews();
         setDynamicShortcutsViews();
+        setRefreshAllWidgetsViews();
     }
 
     @Override
@@ -109,6 +111,11 @@ public class TermuxWidgetActivity extends AppCompatActivity {
         } else {
             dynamicShortcutsLinearLayout.setVisibility(View.GONE);
         }
+    }
+
+    private void setRefreshAllWidgetsViews() {
+        Button refreshAllWidgetsIconButton = findViewById(R.id.btn_refresh_all_widgets);
+        refreshAllWidgetsIconButton.setOnClickListener(v -> TermuxWidgetProvider.sendIntentToRefreshAllWidgets(TermuxWidgetActivity.this, LOG_TAG));
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)

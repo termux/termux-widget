@@ -1,10 +1,13 @@
 package com.termux.widget;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.termux.shared.data.IntentUtils;
+import com.termux.shared.logger.Logger;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.widget.utils.ShortcutUtils;
 
@@ -13,28 +16,36 @@ import java.util.List;
 
 public final class TermuxWidgetService extends RemoteViewsService {
 
+    private static final String LOG_TAG = "TermuxWidgetService";
+
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new ListRemoteViewsFactory(getApplicationContext());
+        int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        Logger.logDebug(LOG_TAG, "onGetViewFactory(): " + appWidgetId);
+        Logger.logVerbose(LOG_TAG, "Intent Received\n" + IntentUtils.getIntentString(intent));
+
+        return new ListRemoteViewsFactory(getApplicationContext(), appWidgetId);
     }
 
     public static class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
+
         private final List<ShortcutFile> shortcutFiles = new ArrayList<>();
         private final Context mContext;
+        private final  int mAppWidgetId;
 
-        public ListRemoteViewsFactory(Context context) {
+        public ListRemoteViewsFactory(Context context, int appWidgetId) {
             mContext = context;
+            mAppWidgetId = appWidgetId;
         }
 
         @Override
         public void onCreate() {
-            // In onCreate() you setup any connections / cursors to your data source. Heavy lifting,
-            // for example downloading or creating content etc, should be deferred to onDataSetChanged()
-            // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.
+            Logger.logDebug(LOG_TAG, "onCreate(): " + mAppWidgetId);
         }
 
         @Override
         public void onDestroy() {
+            Logger.logDebug(LOG_TAG, "onDestroy(): " + mAppWidgetId);
             shortcutFiles.clear();
         }
 
@@ -73,6 +84,8 @@ public final class TermuxWidgetService extends RemoteViewsService {
 
         @Override
         public void onDataSetChanged() {
+            Logger.logDebug(LOG_TAG, "onDataSetChanged(): " + mAppWidgetId);
+
             // This is triggered when you call AppWidgetManager notifyAppWidgetViewDataChanged
             // on the collection view corresponding to this factory. You can do heaving lifting in
             // here, synchronously. For example, if you need to process an image, fetch something
