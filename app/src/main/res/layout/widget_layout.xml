@@ -59,7 +59,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:contentDescription="@string/action_refresh"
-        android:tint="#99000000"
         android:src="@android:drawable/stat_notify_sync" />
 
 </RelativeLayout>
