@@ -17,6 +17,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <receiver
             android:name=".TermuxWidgetProvider"
+            android:exported="false"
             android:label="@string/title_shortcut_widget_name" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -31,6 +32,7 @@
         <activity
             android:name=".activities.TermuxWidgetActivity"
             android:theme="@style/Theme.MaterialComponents.DayNight.TermuxPrimaryActivity" >
+            android:exported="true"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -39,6 +41,7 @@
 
         <activity
             android:name=".TermuxCreateShortcutActivity"
+            android:exported="true"
             android:label="@string/title_single_shortcut_name">
             <intent-filter>
                 <action android:name="android.intent.action.CREATE_SHORTCUT" />
@@ -48,11 +51,11 @@
 
         <activity
             android:name=".TermuxLaunchShortcutActivity"
+            android:exported="true"
             android:noHistory="true"
             android:launchMode="singleInstance"
             android:taskAffinity=".TermuxLaunchShortcutActivity"
-            android:theme="@android:style/Theme.NoDisplay"
-            android:exported="true"/>
+            android:theme="@android:style/Theme.NoDisplay" />
 
         <service
             android:name=".TermuxWidgetService"
@@ -61,6 +64,7 @@
 
         <service
             android:name=".TermuxWidgetControlsProviderService"
+            android:exported="true"
             android:label="@string/title_termux_shortcuts"
             android:permission="android.permission.BIND_CONTROLS">
             <intent-filter>
