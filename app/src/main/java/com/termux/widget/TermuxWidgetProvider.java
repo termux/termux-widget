@@ -24,6 +24,7 @@ import com.termux.shared.file.filesystem.FileType;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.shell.ShellUtils;
 import com.termux.shared.shell.command.ExecutionCommand;
+import com.termux.shared.shell.command.ExecutionCommand.Runner;
 import com.termux.shared.shell.command.result.ResultData;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
@@ -260,7 +261,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         String errmsg;
         Error error;
 
-        ExecutionCommand executionCommand = new ExecutionCommand();
+        ExecutionCommand executionCommand = new ExecutionCommand(-1);
         executionCommand.executable = shortcutFilePath;
 
         // If Termux app is not installed, enabled or accessible with current context or if
@@ -312,7 +313,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         File shortcutFile = new File(executionCommand.executable);
         File shortcutParentDirFile = shortcutFile.getParentFile();
         if (shortcutParentDirFile != null && shortcutParentDirFile.getName().equals(TermuxConstants.TERMUX_SHORTCUT_TASKS_SCRIPTS_DIR_BASENAME)) {
-            executionCommand.inBackground = true;
+            executionCommand.runner = Runner.APP_SHELL.getName();
             // Show feedback for background task
             Toast toast = Toast.makeText(context, context.getString(R.string.msg_executing_task,
                     ShellUtils.getExecutableBasename(executionCommand.executable)),
@@ -322,18 +323,20 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
             // See https://github.com/termux/termux-widget/issues/33
             toast.setGravity(Gravity.TOP, 0, 0);
             toast.show();
+        } else {
+            executionCommand.runner = Runner.TERMINAL_SESSION.getName();
         }
-
 
         // Create execution intent with the action TERMUX_SERVICE#ACTION_SERVICE_EXECUTE to be sent to the TERMUX_SERVICE
         executionCommand.executableUri = new Uri.Builder().scheme(TERMUX_SERVICE.URI_SCHEME_SERVICE_EXECUTE).path(executionCommand.executable).build();
         Intent executionIntent = new Intent(TERMUX_SERVICE.ACTION_SERVICE_EXECUTE, executionCommand.executableUri);
         executionIntent.setClassName(TermuxConstants.TERMUX_PACKAGE_NAME, TermuxConstants.TERMUX_APP.TERMUX_SERVICE_NAME);
-        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND, executionCommand.inBackground);
+        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_RUNNER, executionCommand.runner); // Runner extra will be prioritized over background extra
+        executionIntent.putExtra(TERMUX_SERVICE.EXTRA_BACKGROUND, Runner.APP_SHELL.getName().equals(executionCommand.runner)); // Backward compatibility for runner
         executionIntent.putExtra(TERMUX_SERVICE.EXTRA_PLUGIN_API_HELP, context.getString(R.string.plugin_api_help, TermuxConstants.TERMUX_WIDGET_GITHUB_REPO_URL));
 
         Logger.logVerboseExtended(logTag, executionCommand.toString());
-        Logger.logDebug(logTag, "Sending execution intent to " + executionIntent.getComponent().toString() + " for \"" + executionCommand.executable + "\" with background mode " + executionCommand.inBackground);
+        Logger.logDebug(logTag, "Sending execution intent to " + executionIntent.getComponent().toString() + " for \"" + executionCommand.executable + "\" with runner " + executionCommand.runner);
 
         try {
             // Send execution intent to execution service
