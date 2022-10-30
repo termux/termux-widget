@@ -15,7 +15,7 @@ public class TermuxLaunchShortcutActivity extends Activity {
 		super.onResume();
 
 		// Set log level for the app
-		TermuxWidgetApplication.setLogLevel(this, true);
+		TermuxWidgetApplication.setLogConfig(this, false);
 
 		TermuxWidgetProvider.handleTermuxShortcutExecutionIntent(this, getIntent(), LOG_TAG);
 		finish();

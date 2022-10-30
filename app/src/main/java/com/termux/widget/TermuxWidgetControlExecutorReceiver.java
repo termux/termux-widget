@@ -11,7 +11,7 @@ public class TermuxWidgetControlExecutorReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // Set log level for the receiver
-        TermuxWidgetApplication.setLogLevel(context, true);
+        TermuxWidgetApplication.setLogConfig(context, false);
 
         TermuxWidgetProvider.handleTermuxShortcutExecutionIntent(context, intent, LOG_TAG);
     }

@@ -25,6 +25,7 @@ import com.termux.shared.termux.file.TermuxFileUtils;
 import com.termux.shared.theme.NightMode;
 import com.termux.widget.R;
 import com.termux.widget.ShortcutFile;
+import com.termux.widget.TermuxWidgetApplication;
 import com.termux.widget.TermuxWidgetProvider;
 import com.termux.widget.utils.ShortcutUtils;
 
@@ -70,6 +71,9 @@ public class TermuxWidgetMainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Set log level for the app
+        TermuxWidgetApplication.setLogConfig(this, false);
 
         Logger.logVerbose(LOG_TAG, "onResume");
 
@@ -177,7 +181,7 @@ public class TermuxWidgetMainActivity extends AppCompatActivity {
         Error error = FileUtils.createDirectoryFile(TERMUX_WIDGET_DYNAMIC_SHORTCUTS_DIR_PATH);
         if (error != null) {
             Logger.logError(LOG_TAG, error.toString());
-            Logger.showToast(this, Error.getMinimalErrorLogString(error), true);
+            Logger.showToast(this, error.getMinimalErrorLogString(), true);
         }
 
         List<ShortcutFile> shortcutFiles = new ArrayList<>();
