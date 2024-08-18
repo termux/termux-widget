@@ -55,6 +55,7 @@
         "Open &TERMUX_WIDGET_APP_NAME; app to refresh widget" message instead of showing the
         shortcuts. In this state, the refresh buttons of the widgets itself will not work. Just
         launching the &TERMUX_WIDGET_APP_NAME; app will also refresh the widget.</string>
+    <string name="msg_refresh_widget_from_app">Open &TERMUX_WIDGET_APP_NAME; app to refresh widget</string>
     <string name="action_refresh_all_widgets">Refresh Widgets</string>
 
     <!-- ShortcutFile -->

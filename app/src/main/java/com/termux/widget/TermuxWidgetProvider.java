@@ -85,6 +85,7 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
         // The empty view is displayed when the collection has no items. It should be a sibling
         // of the collection view:
         remoteViews.setEmptyView(R.id.widget_list, R.id.empty_view);
+        remoteViews.setTextViewText(R.id.empty_view, context.getString(R.string.msg_no_shortcut_scripts));
 
         // Setup intent which points to the TermuxWidgetService which will provide the views for this collection.
         Intent intent = new Intent(context, TermuxWidgetService.class);

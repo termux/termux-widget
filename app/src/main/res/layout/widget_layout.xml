@@ -47,7 +47,7 @@
             android:layout_below="@id/top_row"
             android:background="@android:color/white"
             android:padding="6dp"
-            android:text="@string/msg_no_shortcut_scripts"
+            android:text="@string/msg_refresh_widget_from_app"
             android:textColor="@android:color/black" />
     </RelativeLayout>
 
