@@ -184,9 +184,9 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 
                 List<Integer> updatedAppWidgetIds = refreshAppWidgets(context, appWidgetIds, updateRemoteViews);
                 if (updatedAppWidgetIds != null)
-                    Logger.logDebugAndShowToast(context, LOG_TAG, context.getString(R.string.msg_widgets_reloaded, Arrays.toString(appWidgetIds)));
+                    Logger.logDebugAndShowToast(context, LOG_TAG, context.getString(R.string.msg_widgets_refreshed, Arrays.toString(appWidgetIds)));
                 else
-                    Logger.logDebugAndShowToast(context, LOG_TAG, context.getString(R.string.msg_no_widgets_found_to_reload));
+                    Logger.logDebugAndShowToast(context, LOG_TAG, context.getString(R.string.msg_no_widgets_found_to_refresh));
                 return;
 
             } default: {
