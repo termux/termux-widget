@@ -57,6 +57,7 @@ public class TermuxWidgetMainActivity extends AppCompatActivity {
 
         setDynamicShortcutsViews();
         setRefreshAllWidgetsViews();
+        sendIntentToRefreshAllWidgets();
     }
 
     @Override
