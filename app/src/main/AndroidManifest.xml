@@ -64,6 +64,16 @@
             android:taskAffinity=".TermuxLaunchShortcutActivity"
             android:theme="@android:style/Theme.NoDisplay" />
 
+        <receiver
+            android:name=".receivers.SystemEventReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.MY_PACKAGE_UNSUSPENDED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".TermuxWidgetService"
             android:exported="false"
