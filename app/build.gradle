@@ -70,12 +70,14 @@ dependencies {
     implementation "androidx.annotation:annotation:1.9.1"
     implementation "com.google.android.material:material:1.12.0"
     implementation "com.google.guava:guava:24.1-jre"
-    implementation 'com.termux.termux-app:termux-shared:f3ffc36bfd'
 
+    implementation 'com.termux.termux-app:termux-shared:b0e1dbc3da'
     // Use if below libraries are published locally by termux-app with `./gradlew publishReleasePublicationToMavenLocal` and used with `mavenLocal()`.
     // If updates are done, republish there and sync project with gradle files here
     // https://github.com/termux/termux-app/wiki/Termux-Libraries
-    //implementation 'com.termux:termux-shared:0.117'
+    //implementation "com.termux:termux-shared:0.118.0"
+
+    implementation "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava"
 }
 
 task versionName {

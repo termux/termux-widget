@@ -17,15 +17,15 @@ import androidx.annotation.RequiresApi;
 import com.google.common.base.Joiner;
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.file.FileUtils;
-import com.termux.shared.file.TermuxFileUtils;
 import com.termux.shared.file.filesystem.FileType;
 import com.termux.shared.logger.Logger;
-import com.termux.shared.settings.preferences.TermuxWidgetAppSharedPreferences;
 import com.termux.shared.shell.ShellUtils;
 import com.termux.shared.termux.TermuxConstants.TERMUX_APP.TERMUX_SERVICE;
-import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET.TERMUX_WIDGET_PROVIDER;
-import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET;
+import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET_APP.TERMUX_WIDGET_PROVIDER;
+import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET_APP;
 import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.file.TermuxFileUtils;
+import com.termux.shared.termux.settings.preferences.TermuxWidgetAppSharedPreferences;
 import com.termux.widget.utils.ShortcutUtils;
 
 import java.io.File;
@@ -88,7 +88,7 @@ public final class ShortcutFile {
         Intent executionIntent = new Intent(context, TermuxLaunchShortcutActivity.class);
         executionIntent.setAction(TERMUX_SERVICE.ACTION_SERVICE_EXECUTE); // Mandatory for pinned shortcuts
         executionIntent.setData(scriptUri);
-        executionIntent.putExtra(TERMUX_WIDGET.EXTRA_TOKEN_NAME, TermuxWidgetAppSharedPreferences.getGeneratedToken(context));
+        executionIntent.putExtra(TERMUX_WIDGET_APP.EXTRA_TOKEN_NAME, TermuxWidgetAppSharedPreferences.getGeneratedToken(context));
         return executionIntent;
     }
 

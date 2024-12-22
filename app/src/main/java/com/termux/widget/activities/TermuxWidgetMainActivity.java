@@ -14,13 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.termux.shared.android.PackageUtils;
+import com.termux.shared.errors.Error;
 import com.termux.shared.file.FileUtils;
-import com.termux.shared.file.TermuxFileUtils;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.markdown.MarkdownUtils;
-import com.termux.shared.models.errors.Error;
-import com.termux.shared.packages.PackageUtils;
 import com.termux.shared.termux.TermuxConstants;
+import com.termux.shared.termux.file.TermuxFileUtils;
 import com.termux.widget.R;
 import com.termux.widget.ShortcutFile;
 import com.termux.widget.TermuxWidgetProvider;
