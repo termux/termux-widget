@@ -8,17 +8,27 @@
     <!ENTITY TERMUX_SHORTCUT_SCRIPT_ICONS_DIR_PATH_SHORT "~/.shortcuts/icons">
     ]>
 
-<resources>EXTRA_SHORTCUT_INTENT
+<resources>
     <string name="app_name">&TERMUX_WIDGET_APP_NAME;</string>
     <string name="plugin_info">&TERMUX_WIDGET_APP_NAME; is a plugin app for the &TERMUX_APP_NAME; app.
         \n\nCheck &TERMUX_APP_NAME; app github %1$s and &TERMUX_WIDGET_APP_NAME; app github %2$s for more info.</string>
     <string name="plugin_api_help">Visit %1$s for more info on plugin usage.</string>
 
-    <!-- TermuxWidgetActivity -->
-    <string name="msg_disable_launcher_icon_info">The &TERMUX_WIDGET_APP_NAME; app does not require
-        a launcher icon/activity to function. You can optionally disable it if you want and
-        can enabled in again either by reinstalling the app or from the &TERMUX_APP_NAME; app settings
-        if the option has been implemented in your installed version."</string>
+    <!-- TermuxWidgetMainActivity -->
+    <string name="msg_change_launcher_activity_state_info">The &TERMUX_WIDGET_APP_NAME; app does not
+        require a launcher activity/icon to function. You can optionally disable the launcher
+        activity if you want and enable it again from the main activity if required.
+        \n\nThe launcher activity is an alias for the current main activity of the app which can
+        still be opened after disabling the launcher activity. The main activity can be opened
+        from `&TERMUX_APP_NAME; app settings` -> `&TERMUX_WIDGET_APP_NAME;` -> `Open App` if the
+        option has been implemented in your installed &TERMUX_APP_NAME; app version. Otherwise,
+        running the `am start "%1$s/%2$s"` command in the &TERMUX_APP_NAME; app should open it.
+        \n\nNote that on some devices the widgets created on launcher home may not function properly
+        if the launcher activity is disabled and if the widgets have reverted to their default
+        view and show the "Open &TERMUX_WIDGET_APP_NAME; app to refresh widget" message, then
+        opening the launcher/main activity will be necessary to refresh the widgets. Additionally,
+        if the launcher activity has been disabled and the widget is in the default view, then
+        clicking the widget title may crash your launcher.</string>
 
     <string name="msg_max_shortcuts_limit_info">The current max static and dynamic shortcuts limit
         for the &TERMUX_WIDGET_APP_NAME; app is %1$d.
@@ -40,11 +50,12 @@
 
     <string name="msg_refresh_all_widgets_info">To manually refresh all widgets to show updated
         shortcuts, click the refresh button.
-        \n\nThis may also be needed in some cases after app updates where widgets become non-responsive
-        and do not show any shortcuts and refresh buttons of the widgets itself do not work either.</string>
-    <string name="action_refresh_all_widgets">Refresh</string>
-
-
+        \n\nThis may also be needed in some cases after app updates where widgets revert to their
+        default view and become non-responsive and show the
+        "Open &TERMUX_WIDGET_APP_NAME; app to refresh widget" message instead of showing the
+        shortcuts. In this state, the refresh buttons of the widgets itself will not work. Just
+        launching the &TERMUX_WIDGET_APP_NAME; app will also refresh the widget.</string>
+    <string name="action_refresh_all_widgets">Refresh Widgets</string>
 
     <!-- ShortcutFile -->
     <string name="msg_shortcut_icon_file_used">Using file at `%1$s` as shortcut icon file</string>

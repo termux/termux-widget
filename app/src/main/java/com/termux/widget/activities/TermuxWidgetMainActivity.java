@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.termux.shared.file.FileUtils;
 import com.termux.shared.file.TermuxFileUtils;
 import com.termux.shared.logger.Logger;
+import com.termux.shared.markdown.MarkdownUtils;
 import com.termux.shared.models.errors.Error;
 import com.termux.shared.packages.PackageUtils;
 import com.termux.shared.termux.TermuxConstants;
@@ -30,9 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class TermuxWidgetActivity extends AppCompatActivity {
+public class TermuxWidgetMainActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "TermuxWidgetActivity";
+    public static final String LOG_TAG = "TermuxWidgetMainActivity";
 
     /** Termux:Widget app data home directory path. */
     public static final String TERMUX_WIDGET_DATA_HOME_DIR_PATH = TermuxConstants.TERMUX_DATA_HOME_DIR_PATH + "/widget"; // Default: "/data/data/com.termux/files/home/.termux/widget"
@@ -48,13 +49,12 @@ public class TermuxWidgetActivity extends AppCompatActivity {
 
         Logger.logDebug(LOG_TAG, "onCreate");
 
-        setContentView(R.layout.activity_termux_widget);
+        setContentView(R.layout.activity_termux_widget_main);
 
         TextView pluginInfo = findViewById(R.id.textview_plugin_info);
         pluginInfo.setText(getString(R.string.plugin_info, TermuxConstants.TERMUX_GITHUB_REPO_URL,
                 TermuxConstants.TERMUX_WIDGET_GITHUB_REPO_URL));
 
-        setDisableLauncherIconViews();
         setDynamicShortcutsViews();
         setRefreshAllWidgetsViews();
     }
@@ -65,6 +65,7 @@ public class TermuxWidgetActivity extends AppCompatActivity {
 
         Logger.logVerbose(LOG_TAG, "onResume");
 
+        setChangeLauncherActivityStateViews();
         setMaxShortcutsLimitView();
     }
 
@@ -82,14 +83,49 @@ public class TermuxWidgetActivity extends AppCompatActivity {
         }
     }
 
-    private void setDisableLauncherIconViews() {
-        Button disableLauncherIconButton = findViewById(R.id.btn_disable_launcher_icon);
-        disableLauncherIconButton.setOnClickListener(v -> {
-            String message = getString(R.string.msg_disabling_launcher_icon, TermuxConstants.TERMUX_WIDGET_APP_NAME);
-            Logger.logInfo(LOG_TAG, message);
-            PackageUtils.setComponentState(TermuxWidgetActivity.this,
-                    TermuxConstants.TERMUX_WIDGET_PACKAGE_NAME, TermuxConstants.TERMUX_WIDGET.TERMUX_WIDGET_ACTIVITY_NAME,
-                    false, message, true);
+    private void setChangeLauncherActivityStateViews() {
+        String packageName = TermuxConstants.TERMUX_WIDGET_PACKAGE_NAME;
+        String className = TermuxConstants.TERMUX_WIDGET_APP.TERMUX_WIDGET_LAUNCHER_ACTIVITY_NAME;
+
+        TextView changeLauncherActivityStateTextView = findViewById(R.id.textview_change_launcher_activity_state_details);
+        changeLauncherActivityStateTextView.setText(MarkdownUtils.getSpannedMarkdownText(this,
+                getString(R.string.msg_change_launcher_activity_state_info, packageName, getClass().getName())));
+
+        Button changeLauncherActivityStateButton = findViewById(R.id.button_change_launcher_activity_state);
+        String stateChangeMessage;
+        boolean newState;
+
+        Boolean currentlyDisabled = PackageUtils.isComponentDisabled(this,
+                packageName, className, false);
+        if (currentlyDisabled == null) {
+            Logger.logError(LOG_TAG, "Failed to check if \"" + packageName + "/" + className + "\" launcher activity is disabled");
+            changeLauncherActivityStateButton.setEnabled(false);
+            changeLauncherActivityStateButton.setAlpha(.5f);
+            changeLauncherActivityStateButton.setText(com.termux.shared.R.string.action_disable_launcher_icon);
+            changeLauncherActivityStateButton.setOnClickListener(null);
+            return;
+        }
+
+        changeLauncherActivityStateButton.setEnabled(true);
+        changeLauncherActivityStateButton.setAlpha(1f);
+        if (currentlyDisabled) {
+            changeLauncherActivityStateButton.setText(com.termux.shared.R.string.action_enable_launcher_icon);
+            stateChangeMessage = getString(com.termux.shared.R.string.msg_enabling_launcher_icon, TermuxConstants.TERMUX_WIDGET_APP_NAME);
+            newState = true;
+        } else {
+            changeLauncherActivityStateButton.setText(com.termux.shared.R.string.action_disable_launcher_icon);
+            stateChangeMessage = getString(com.termux.shared.R.string.msg_disabling_launcher_icon, TermuxConstants.TERMUX_WIDGET_APP_NAME);
+            newState = false;
+        }
+
+        changeLauncherActivityStateButton.setOnClickListener(v -> {
+            Logger.logInfo(LOG_TAG, stateChangeMessage);
+            String errmsg = PackageUtils.setComponentState(this,
+                    packageName, className, newState, stateChangeMessage, true);
+            if (errmsg == null)
+                setChangeLauncherActivityStateViews();
+            else
+                Logger.logError(LOG_TAG, errmsg);
         });
     }
 
@@ -100,22 +136,28 @@ public class TermuxWidgetActivity extends AppCompatActivity {
             dynamicShortcutsLinearLayout.setVisibility(View.VISIBLE);
 
             TextView dynamicShortcutsInfoTextView = findViewById(R.id.textview_dynamic_shortcuts_info);
-            dynamicShortcutsInfoTextView.setText(getString(R.string.msg_dynamic_shortcuts_info,
-                    TermuxFileUtils.getUnExpandedTermuxPath(TERMUX_WIDGET_DYNAMIC_SHORTCUTS_DIR_PATH)));
+            dynamicShortcutsInfoTextView.setText(MarkdownUtils.getSpannedMarkdownText(this,
+                    getString(R.string.msg_dynamic_shortcuts_info,
+                    TermuxFileUtils.getUnExpandedTermuxPath(TERMUX_WIDGET_DYNAMIC_SHORTCUTS_DIR_PATH))));
 
-            Button createDynamicShortcutsButton = findViewById(R.id.btn_create_dynamic_shortcuts);
-            createDynamicShortcutsButton.setOnClickListener(v -> createDynamicShortcuts(TermuxWidgetActivity.this));
-            
-            Button removeDynamicShortcutsButton = findViewById(R.id.btn_remove_dynamic_shortcuts);
-            removeDynamicShortcutsButton.setOnClickListener(v -> removeDynamicShortcuts(TermuxWidgetActivity.this));
+            Button createDynamicShortcutsButton = findViewById(R.id.button_create_dynamic_shortcuts);
+            createDynamicShortcutsButton.setOnClickListener(v -> createDynamicShortcuts(this));
+
+            Button removeDynamicShortcutsButton = findViewById(R.id.button_remove_dynamic_shortcuts);
+            removeDynamicShortcutsButton.setOnClickListener(v -> removeDynamicShortcuts(this));
         } else {
             dynamicShortcutsLinearLayout.setVisibility(View.GONE);
         }
     }
 
     private void setRefreshAllWidgetsViews() {
-        Button refreshAllWidgetsIconButton = findViewById(R.id.btn_refresh_all_widgets);
-        refreshAllWidgetsIconButton.setOnClickListener(v -> TermuxWidgetProvider.sendIntentToRefreshAllWidgets(TermuxWidgetActivity.this, LOG_TAG));
+        Button refreshAllWidgetsIconButton = findViewById(R.id.button_refresh_all_widgets);
+        refreshAllWidgetsIconButton.setOnClickListener(
+                v -> sendIntentToRefreshAllWidgets());
+    }
+
+    public void sendIntentToRefreshAllWidgets() {
+        TermuxWidgetProvider.sendIntentToRefreshAllWidgets(this, LOG_TAG);
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
