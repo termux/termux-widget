@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.termux.shared.activity.media.AppCompatActivityUtils;
 import com.termux.shared.android.PackageUtils;
 import com.termux.shared.errors.Error;
 import com.termux.shared.file.FileUtils;
@@ -21,6 +22,7 @@ import com.termux.shared.logger.Logger;
 import com.termux.shared.markdown.MarkdownUtils;
 import com.termux.shared.termux.TermuxConstants;
 import com.termux.shared.termux.file.TermuxFileUtils;
+import com.termux.shared.theme.NightMode;
 import com.termux.widget.R;
 import com.termux.widget.ShortcutFile;
 import com.termux.widget.TermuxWidgetProvider;
@@ -50,6 +52,11 @@ public class TermuxWidgetMainActivity extends AppCompatActivity {
         Logger.logDebug(LOG_TAG, "onCreate");
 
         setContentView(R.layout.activity_termux_widget_main);
+
+        AppCompatActivityUtils.setNightMode(this, NightMode.getAppNightMode().getName(), true);
+
+        AppCompatActivityUtils.setToolbar(this, com.termux.shared.R.id.toolbar);
+        AppCompatActivityUtils.setToolbarTitle(this, com.termux.shared.R.id.toolbar, TermuxConstants.TERMUX_WIDGET_APP_NAME, 0);
 
         TextView pluginInfo = findViewById(R.id.textview_plugin_info);
         pluginInfo.setText(getString(R.string.plugin_info, TermuxConstants.TERMUX_GITHUB_REPO_URL,

@@ -1,6 +1,5 @@
 package com.termux.widget;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.ShortcutManager;
@@ -11,7 +10,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 
+import com.termux.shared.activity.media.AppCompatActivityUtils;
 import com.termux.shared.data.DataUtils;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.termux.TermuxConstants;
@@ -21,7 +22,7 @@ import com.termux.widget.utils.ShortcutUtils;
 import java.io.File;
 import java.util.Arrays;
 
-public class TermuxCreateShortcutActivity extends Activity {
+public class TermuxCreateShortcutActivity extends AppCompatActivity {
 
     private ListView mListView;
     private File mCurrentDirectory;
@@ -32,8 +33,10 @@ public class TermuxCreateShortcutActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.shortcuts_listview);
+        setContentView(R.layout.activity_termux_create_shortcut);
         mListView = findViewById(R.id.list);
+
+        AppCompatActivityUtils.setToolbar(this, com.termux.shared.R.id.toolbar);
     }
 
     @Override
@@ -70,7 +73,7 @@ public class TermuxCreateShortcutActivity extends Activity {
         Arrays.sort(mCurrentFiles, (f1, f2) -> f1.getName().compareTo(f2.getName()));
 
         final boolean isTopDir = directory.equals(TermuxConstants.TERMUX_SHORTCUT_SCRIPTS_DIR);
-        getActionBar().setDisplayHomeAsUpEnabled(!isTopDir);
+        AppCompatActivityUtils.setShowBackButtonInActionBar(this, !isTopDir);
 
         if (isTopDir && mCurrentFiles.length == 0) {
             // Create if necessary so user can more easily add.

@@ -6,6 +6,7 @@ import android.content.Context;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.termux.crash.TermuxCrashUtils;
 import com.termux.shared.termux.settings.preferences.TermuxWidgetAppSharedPreferences;
+import com.termux.shared.termux.theme.TermuxThemeUtils;
 
 public class TermuxWidgetApplication extends Application {
 
@@ -19,6 +20,9 @@ public class TermuxWidgetApplication extends Application {
         setLogLevel(getApplicationContext(), true);
 
         Logger.logDebug("Starting Application");
+
+        // Set NightMode.APP_NIGHT_MODE
+        TermuxThemeUtils.setAppNightMode(context);
     }
 
     public static void setLogLevel(Context context, boolean commitToFile) {
