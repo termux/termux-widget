@@ -195,7 +195,7 @@ public class TermuxWidgetControlsProviderService extends ControlsProviderService
      */
     private PendingIntent createNoopPendingIntent() {
         Intent emptyIntent = new Intent();
-        return PendingIntent.getActivity(getBaseContext(), 1, emptyIntent, 0);
+        return PendingIntent.getActivity(getBaseContext(), 1, emptyIntent, PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**
