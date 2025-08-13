@@ -64,6 +64,15 @@
             android:taskAffinity=".TermuxLaunchShortcutActivity"
             android:theme="@android:style/Theme.NoDisplay" />
 
+        <!-- If you see "Unresolved package" errors for ReportActivity with manifest placeholder,
+             ignore it. Android Studio linter is broken and correct package name will be used at build time. -->
+        <activity
+            android:name="${TERMUX_PACKAGE_NAME}.shared.activities.ReportActivity"
+            android:exported="false"
+            android:documentLaunchMode="intoExisting"
+            android:theme="@style/Theme.MarkdownViewActivity.DayNight"
+            tools:ignore="MissingClass" />
+
         <receiver
             android:name=".receivers.SystemEventReceiver"
             android:exported="false">
