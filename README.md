@@ -21,7 +21,7 @@ A [Termux] plugin app to run scripts in Termux with launcher shortcuts and widge
 
 ### Installation
 
-Latest version is `v0.14.0`.
+Latest version is `v0.15.0`.
 
 Check [`termux-app` Installation](https://github.com/termux/termux-app#Installation) for details before reading forward.
 
