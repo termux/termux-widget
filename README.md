@@ -84,11 +84,20 @@ chmod 700 -R /data/data/com.termux/files/home/.shortcuts/tasks
 
 Once you have created the directories, you can then create scripts files as per instructions in [Creating And Modifying Scripts](#Creating-And-Modifying-Scripts).
 
-Once you have created script files, you can add a launcher widget for the `Termux:Widget` app that will show the list of the script files, which you can execute by clicking them. If you create/modify shortcuts files, you will have to press the refresh button on the widget for the updated list to be shown. You can also update all widgets from inside the app with the `REFRESH` button in the refresh widgets section. You can also refresh a specific widget by running `am broadcast -n com.termux.widget/.TermuxWidgetProvider -a com.termux.widget.ACTION_REFRESH_WIDGET --ei appWidgetId <id>` from Termux terminal/scripts for version `>= 0.13.0`, where `id` is the number in the `Termux widgets reloaded: <id>)` flash shown when you press the refresh button. You can pass `0` to update all widgets for version `>= 0.114.0`. Refreshing widgets with the in-app `REFRESH` button or running command with id `0` may also be needed in some cases after app updates where widgets become non-responsive and do not show any shortcuts and refresh buttons of the widgets itself do not work either.
+Once you have created script files, two widgets will be available for you to add a button on the home screen that launches a script.
+Exactly how to add a widget on the home screen will vary between devices, but typically you long press home screen, press widgets, and then scroll down to the "termux" section:
 
-You can also add a launcher shortcut or dynamic shortcut for any script file with an optional custom icon as detailed in [Script Icon Directory](#script-icon-directory-optional).
+<img src="imgs/access_widgets.png" alt="" width="50%"/>
+<img src="imgs/widget_selection.png" alt="" width="50%"/>
 
-<img src="termux-widget.png" alt="" width="50%"/>
+The 2x2 widget is a launcher that will show a menu of all your script files from which you can select the script to launch by tapping on it.
+The 1x1 widget is a widget for an individual script.
+
+<img src="imgs/termux-widget.png" alt="" width="50%"/>
+
+For the launcher widget (2x2), if you create/modify shortcuts files, you will have to press the refresh button on the widget for the updated list to be shown. You can also update all widgets from inside the `Termux:Widget` app with the `REFRESH` button in the refresh widgets section. You can also refresh a specific widget by running `am broadcast -n com.termux.widget/.TermuxWidgetProvider -a com.termux.widget.ACTION_REFRESH_WIDGET --ei appWidgetId <id>` from Termux terminal/scripts for version `>= 0.13.0`, where `id` is the number in the `Termux widgets reloaded: <id>)` flash shown when you press the refresh button. You can pass `0` to update all widgets for version `>= 0.114.0`. Refreshing widgets with the in-app `REFRESH` button or running command with id `0` may also be needed in some cases after app updates where widgets become non-responsive and do not show any shortcuts and refresh buttons of the widgets itself do not work either.
+
+The icon for scripts will default to a black terminal icon, but it is possible to customize the icon for each script, to do so see the instructions in [Script Icon Directory](#script-icon-directory-optional).
 
 
 #### Script Icon Directory (Optional)
@@ -108,6 +117,13 @@ mkdir -p /data/data/com.termux/files/home/.shortcuts/icons
 chmod -R a-x,u=rwX,go-rwx /data/data/com.termux/files/home/.shortcuts/icons
 ```
 The `chmod` command will set the `icons` directory permissions to `0700`, but any files already in the directory will be set to `0600` which is recommended.
+
+In order to move an image stored in your phone storage to the tmux `~/.shortcuts/icons` directory, you will find the `termux-setup-storage` command useful. It creates a new directory `~/storage` which contains links to your phone storage.
+```
+termux-setup-storage
+ls ~/storage
+```
+You can then use for example: `mv ~/storage/downloads/myicon.png ~/.shortcuts/<script_name>.png`
 
 
 #### Dynamic Shortcuts (Optional)
@@ -182,6 +198,20 @@ You can use `shell` based text editors like `nano`, `vim` or `emacs` to create a
 You can also use `GUI` based text editor android apps that support `SAF`. Termux provides a [Storage Access Framework (SAF)](https://wiki.termux.com/wiki/Internal_and_external_storage) file provider to allow other apps to access its `~/` home directory. However, the `$PREFIX/` directory is not accessible to other apps. The [QuickEdit] or [QuickEdit Pro] app does support `SAF` and can handle large files without crashing, however, it is closed source and its pro version without ads is paid. You can also use [Acode editor] or [Turbo Editor] if you want an open source app.
 
 Note that the android default `SAF` `Document` file picker may not support hidden file or directories like `~/.shortcuts` which start with a dot `.`, so if you try to use it to open files for a text editor app, then that directory will not show. You can instead create a symlink for  `~/.shortcuts` at `~/shortcuts_sym` so that it is shown. Use `ln -s "/data/data/com.termux/files/home/.shortcuts" "/data/data/com.termux/files/home/shortcuts_sym"` to create it.
+
+#### Examples and useful commands for script building
+
+Here is a hello world in bash
+```
+#!/bin/bash
+
+echo "hello world"
+sleep 5
+```
+The sleep is used here so that the window doesn't instantly close when you run the script, for demonstration purposes.
+
+You might want to have a look and install [termux-api](https://wiki.termux.dev/wiki/Termux:API) for some useful commands that you can use to build scripts.
+
 ##
 
 
