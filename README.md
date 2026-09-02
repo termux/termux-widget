@@ -109,6 +109,14 @@ chmod -R a-x,u=rwX,go-rwx /data/data/com.termux/files/home/.shortcuts/icons
 ```
 The `chmod` command will set the `icons` directory permissions to `0700`, but any files already in the directory will be set to `0600` which is recommended.
 
+**Note:** Add the icon file *before* you create the shortcut. Some launchers save shortcut icons in a cache. The launcher may not update this cache correctly. If you add the icon file after you create the shortcut, the launcher may keep showing the default `Termux:Widget` icon, even after you add the correct icon file. Removing the shortcut and adding it again may not resolve this issue. This is not a `Termux:Widget` problem. It is a fault in the launcher app.
+
+If the shortcut icon does not show correctly and the default Termux icon is used:
+
+1. Add the correct `<script_name>.png` file to `~/.shortcuts/icons` if you have not already done so.
+2. Clear the storage of your launcher app. The "Clear cache" option likely will not work. Use the "Clear storage" option instead. Go to `Android Settings` -> `Apps` -> `<your launcher app>` -> `Storage` -> `Clear storage`.
+   - **Warning:** This action deletes your home screen layout. You must set up your home screen again after this action.
+3. Create the shortcut again from `Termux:Widget`.
 
 #### Dynamic Shortcuts (Optional)
 
