@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget skin colors (light), overridden in values-night/colors.xml -->
+    <color name="widget_bg">#FFFFFFFF</color>
+    <color name="widget_text_primary">#FF1A1A1A</color>
+    <color name="widget_text_secondary">#FF7A7A7A</color>
+    <color name="widget_divider">#1F000000</color>
+    <color name="widget_ripple">#33000000</color>
+</resources>

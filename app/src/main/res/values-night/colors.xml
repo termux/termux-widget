@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget skin colors (dark) -->
+    <color name="widget_bg">#FF252525</color>
+    <color name="widget_text_primary">#FFFAFAFA</color>
+    <color name="widget_text_secondary">#FFA6A6A6</color>
+    <color name="widget_divider">#1FFFFFFF</color>
+    <color name="widget_ripple">#33FFFFFF</color>
+</resources>

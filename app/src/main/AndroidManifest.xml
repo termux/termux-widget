@@ -46,6 +46,16 @@
         </activity-alias>
 
         <activity
+            android:name=".activities.TermuxWidgetConfigureActivity"
+            android:exported="true"
+            android:label="@string/title_widget_settings"
+            android:theme="@style/Theme.BaseActivity.DayNight.NoActionBar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".TermuxCreateShortcutActivity"
             android:exported="true"
             android:label="@string/title_single_shortcut_name"

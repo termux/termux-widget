@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget background. On API 31+ drawable-v31/widget_bg.xml uses the system widget radius instead. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle" >
+
+    <solid android:color="@color/widget_bg" />
+
+    <corners android:radius="16dp" />
+
+</shape>
