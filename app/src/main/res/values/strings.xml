@@ -61,6 +61,11 @@
     <!-- TermuxWidgetConfigureActivity -->
     <string name="title_widget_settings">Widget settings</string>
     <string name="label_widget_background_opacity">Background opacity: %1$d%%</string>
+    <string name="label_widget_background_color">Background color</string>
+    <string name="label_widget_color_auto">Follow dark mode</string>
+    <string name="label_widget_color_white">White</string>
+    <string name="label_widget_color_black">Black</string>
+    <string name="label_widget_color_wallpaper">Wallpaper color</string>
     <string name="action_save">Save</string>
 
     <!-- ShortcutFile -->

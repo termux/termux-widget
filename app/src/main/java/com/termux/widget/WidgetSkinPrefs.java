@@ -14,6 +14,14 @@ public final class WidgetSkinPrefs {
     private static final String PREFERENCES_NAME = "widget_skin";
 
     private static final String KEY_ALPHA_PREFIX = "alpha_";
+    private static final String KEY_COLOR_PREFIX = "color_";
+
+    /** Background color follows the system dark mode. */
+    public static final int COLOR_AUTO = 0;
+    public static final int COLOR_WHITE = 1;
+    public static final int COLOR_BLACK = 2;
+    /** Background color is taken from the wallpaper based system palette on Android 12+. */
+    public static final int COLOR_WALLPAPER = 3;
 
     /** Default background opacity in percent. */
     public static final int DEFAULT_ALPHA_PERCENT = 100;
@@ -37,10 +45,24 @@ public final class WidgetSkinPrefs {
                 .apply();
     }
 
+    /** Get background color mode, one of the {@code COLOR_*} constants, for the widget. */
+    public static int getColorMode(@NonNull Context context, int appWidgetId) {
+        int mode = getSharedPreferences(context).getInt(KEY_COLOR_PREFIX + appWidgetId, COLOR_AUTO);
+        return mode >= COLOR_AUTO && mode <= COLOR_WALLPAPER ? mode : COLOR_AUTO;
+    }
+
+    /** Set background color mode, one of the {@code COLOR_*} constants, for the widget. */
+    public static void setColorMode(@NonNull Context context, int appWidgetId, int mode) {
+        getSharedPreferences(context).edit()
+                .putInt(KEY_COLOR_PREFIX + appWidgetId, mode)
+                .apply();
+    }
+
     /** Remove all skin settings of the widget. */
     public static void remove(@NonNull Context context, int appWidgetId) {
         getSharedPreferences(context).edit()
                 .remove(KEY_ALPHA_PREFIX + appWidgetId)
+                .remove(KEY_COLOR_PREFIX + appWidgetId)
                 .apply();
     }
 

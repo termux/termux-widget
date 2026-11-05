@@ -84,10 +84,13 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
 
-        // Set background opacity. Only the background ImageView alpha is changed so that the
-        // content layer stays opaque and the rounded corners of the background drawable are kept.
-        int percent = WidgetSkinPrefs.getAlphaPercent(context, appWidgetId);
-        remoteViews.setInt(android.R.id.background, "setImageAlpha", Math.round(percent * 255f / 100f));
+        // Set background color and opacity, and matching text colors. See WidgetSkin for the
+        // One UI Home blur.
+        WidgetSkin skin = WidgetSkin.get(context, appWidgetId);
+        WidgetSkin.setColor(context, remoteViews, android.R.id.background, "setBackgroundColor", skin.backgroundLight, skin.backgroundDark);
+        WidgetSkin.setColor(context, remoteViews, R.id.widget_title, "setTextColor", skin.textPrimaryLight, skin.textPrimaryDark);
+        WidgetSkin.setColor(context, remoteViews, R.id.empty_view, "setTextColor", skin.textSecondaryLight, skin.textSecondaryDark);
+        WidgetSkin.setColor(context, remoteViews, R.id.refresh_button, "setColorFilter", skin.textPrimaryLight, skin.textPrimaryDark);
 
         // The empty view is displayed when the collection has no items. It should be a sibling
         // of the collection view:

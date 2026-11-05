@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+     Root view is @android:id/background so that its color is used as widget background. Its
+     color and alpha are set from TermuxWidgetProvider. Launchers on Android 12+ clip it with the
+     system widget corner radius and One UI Home 7.0+ blurs the wallpaper behind it, see WidgetSkin.
+-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <!--
-         Background layer. Its alpha is set with setImageAlpha() from TermuxWidgetProvider so that
-         only the background becomes transparent and not the content layer. The launcher on
-         Android 12+ also looks for the @android:id/background view for rounded corner clipping.
-    -->
-
-    <ImageView
-        android:id="@android:id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:importantForAccessibility="no"
-        android:scaleType="fitXY"
-        android:src="@drawable/widget_bg" />
+    android:layout_height="match_parent"
+    android:background="@color/widget_bg" >
 
     <!-- Content layer. Title and refresh button are inset 16dp so that they are not clipped by rounded corners. -->
 

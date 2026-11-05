@@ -17,6 +17,44 @@
         android:textSize="20sp" />
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/label_widget_background_color"
+        android:textSize="14sp" />
+
+    <RadioGroup
+        android:id="@+id/radio_group_color"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp" >
+
+        <RadioButton
+            android:id="@+id/radio_color_auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_widget_color_auto" />
+
+        <RadioButton
+            android:id="@+id/radio_color_white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_widget_color_white" />
+
+        <RadioButton
+            android:id="@+id/radio_color_black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_widget_color_black" />
+
+        <RadioButton
+            android:id="@+id/radio_color_wallpaper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/label_widget_color_wallpaper" />
+    </RadioGroup>
+
+    <TextView
         android:id="@+id/text_alpha_value"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

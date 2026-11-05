@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Widget skin colors for light and dark backgrounds. WidgetSkin picks from these at runtime. -->
+    <color name="widget_bg_light">#FFFFFFFF</color>
+    <color name="widget_bg_dark">#FF252525</color>
+    <color name="widget_bg_black">#FF000000</color>
+    <color name="widget_text_primary_light">#FF1A1A1A</color>
+    <color name="widget_text_primary_dark">#FFFAFAFA</color>
+    <color name="widget_text_secondary_light">#FF7A7A7A</color>
+    <color name="widget_text_secondary_dark">#FFA6A6A6</color>
+
     <!-- Widget skin colors (light), overridden in values-night/colors.xml -->
-    <color name="widget_bg">#FFFFFFFF</color>
-    <color name="widget_text_primary">#FF1A1A1A</color>
-    <color name="widget_text_secondary">#FF7A7A7A</color>
-    <color name="widget_divider">#1F000000</color>
-    <color name="widget_ripple">#33000000</color>
+    <color name="widget_bg">@color/widget_bg_light</color>
+    <color name="widget_text_primary">@color/widget_text_primary_light</color>
+    <color name="widget_text_secondary">@color/widget_text_secondary_light</color>
+    <!-- Neutral, since the background color can be chosen independent of dark mode. -->
+    <color name="widget_divider">#29808080</color>
+    <color name="widget_ripple">#33808080</color>
 </resources>
