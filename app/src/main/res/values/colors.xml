@@ -9,6 +9,12 @@
     <color name="widget_text_secondary_light">#FF7A7A7A</color>
     <color name="widget_text_secondary_dark">#FFA6A6A6</color>
 
+    <!-- Explicit text colors are independent of the background and system mode. -->
+    <color name="widget_text_white">#FFFFFFFF</color>
+    <color name="widget_text_white_secondary">#B3FFFFFF</color>
+    <color name="widget_text_black">#FF000000</color>
+    <color name="widget_text_black_secondary">#99000000</color>
+
     <!-- Widget skin colors (light), overridden in values-night/colors.xml -->
     <color name="widget_bg">@color/widget_bg_light</color>
     <color name="widget_text_primary">@color/widget_text_primary_light</color>

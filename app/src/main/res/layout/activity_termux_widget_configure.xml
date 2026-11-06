@@ -1,78 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
+    android:fillViewport="true"
     tools:context=".activities.TermuxWidgetConfigureActivity">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="16dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="@string/title_widget_settings"
-        android:textSize="20sp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/label_widget_background_color"
-        android:textSize="14sp" />
-
-    <RadioGroup
-        android:id="@+id/radio_group_color"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp" >
-
-        <RadioButton
-            android:id="@+id/radio_color_auto"
+        android:orientation="vertical"
+        android:padding="24dp">
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_widget_color_auto" />
+            android:paddingBottom="16dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/title_widget_settings"
+            android:textSize="20sp" />
 
-        <RadioButton
-            android:id="@+id/radio_color_white"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_widget_color_white" />
+            android:text="@string/label_widget_background_color"
+            android:textSize="14sp" />
 
-        <RadioButton
-            android:id="@+id/radio_color_black"
+        <RadioGroup
+            android:id="@+id/radio_group_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_widget_color_black" />
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" >
 
-        <RadioButton
-            android:id="@+id/radio_color_wallpaper"
+            <RadioButton
+                android:id="@+id/radio_color_auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_widget_color_auto" />
+
+            <RadioButton
+                android:id="@+id/radio_color_white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_widget_color_white" />
+
+            <RadioButton
+                android:id="@+id/radio_color_black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_widget_color_black" />
+
+            <RadioButton
+                android:id="@+id/radio_color_wallpaper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_widget_color_wallpaper" />
+        </RadioGroup>
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_widget_color_wallpaper" />
-    </RadioGroup>
+            android:text="@string/label_widget_text_color"
+            android:textSize="14sp" />
 
-    <TextView
-        android:id="@+id/text_alpha_value"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="14sp" />
+        <RadioGroup
+            android:id="@+id/radio_group_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" >
 
-    <SeekBar
-        android:id="@+id/seekbar_alpha"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:max="100" />
+            <RadioButton
+                android:id="@+id/radio_text_auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_widget_text_auto" />
 
-    <Button
-        android:id="@+id/button_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="16dp"
-        android:text="@string/action_save" />
+            <RadioButton
+                android:id="@+id/radio_text_white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_widget_text_white" />
 
-</LinearLayout>
+            <RadioButton
+                android:id="@+id/radio_text_black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_widget_text_black" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/text_alpha_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp" />
+
+        <SeekBar
+            android:id="@+id/seekbar_alpha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:max="100" />
+
+        <Button
+            android:id="@+id/button_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="16dp"
+            android:text="@string/action_save" />
+
+    </LinearLayout>
+</ScrollView>

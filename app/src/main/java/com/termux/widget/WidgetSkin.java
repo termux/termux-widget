@@ -56,18 +56,35 @@ public final class WidgetSkin {
 
         switch (WidgetSkinPrefs.getColorMode(context, appWidgetId)) {
             case WidgetSkinPrefs.COLOR_WHITE:
-                return new WidgetSkin(withAlpha(bgLight, alpha), withAlpha(bgLight, alpha),
-                        onLight, onLight, onLightSecondary, onLightSecondary);
+                bgDark = bgLight;
+                onDark = onLight;
+                onDarkSecondary = onLightSecondary;
+                break;
             case WidgetSkinPrefs.COLOR_BLACK:
-                int black = context.getColor(R.color.widget_bg_black);
-                return new WidgetSkin(withAlpha(black, alpha), withAlpha(black, alpha),
-                        onDark, onDark, onDarkSecondary, onDarkSecondary);
+                bgLight = bgDark = context.getColor(R.color.widget_bg_black);
+                onLight = onDark;
+                onLightSecondary = onDarkSecondary;
+                break;
             case WidgetSkinPrefs.COLOR_WALLPAPER:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     // Resolved now, so a new wallpaper is picked up on the next widget update.
                     bgLight = context.getColor(android.R.color.system_accent1_100);
                     bgDark = context.getColor(android.R.color.system_accent1_800);
                 }
+                break;
+            default:
+                break;
+        }
+
+        // Explicit text colors stay the same across all backgrounds and system modes.
+        switch (WidgetSkinPrefs.getTextMode(context, appWidgetId)) {
+            case WidgetSkinPrefs.TEXT_WHITE:
+                onLight = onDark = context.getColor(R.color.widget_text_white);
+                onLightSecondary = onDarkSecondary = context.getColor(R.color.widget_text_white_secondary);
+                break;
+            case WidgetSkinPrefs.TEXT_BLACK:
+                onLight = onDark = context.getColor(R.color.widget_text_black);
+                onLightSecondary = onDarkSecondary = context.getColor(R.color.widget_text_black_secondary);
                 break;
             default:
                 break;

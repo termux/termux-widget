@@ -66,6 +66,10 @@
     <string name="label_widget_color_white">White</string>
     <string name="label_widget_color_black">Black</string>
     <string name="label_widget_color_wallpaper">Wallpaper color</string>
+    <string name="label_widget_text_color">Text color</string>
+    <string name="label_widget_text_auto">Follow background</string>
+    <string name="label_widget_text_white">White text</string>
+    <string name="label_widget_text_black">Black text</string>
     <string name="action_save">Save</string>
 
     <!-- ShortcutFile -->

@@ -30,6 +30,7 @@ public class TermuxWidgetConfigureActivity extends AppCompatActivity {
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
     private RadioGroup mColorRadioGroup;
+    private RadioGroup mTextRadioGroup;
     private TextView mAlphaValueTextView;
     private SeekBar mAlphaSeekBar;
 
@@ -56,6 +57,7 @@ public class TermuxWidgetConfigureActivity extends AppCompatActivity {
         Logger.logDebug(LOG_TAG, "Configuring widget id: " + mAppWidgetId);
 
         setColorViews();
+        setTextViews();
         setAlphaViews();
 
         Button saveButton = findViewById(R.id.button_save);
@@ -94,6 +96,28 @@ public class TermuxWidgetConfigureActivity extends AppCompatActivity {
         return WidgetSkinPrefs.COLOR_AUTO;
     }
 
+    private void setTextViews() {
+        mTextRadioGroup = findViewById(R.id.radio_group_text);
+        switch (WidgetSkinPrefs.getTextMode(this, mAppWidgetId)) {
+            case WidgetSkinPrefs.TEXT_WHITE:
+                mTextRadioGroup.check(R.id.radio_text_white);
+                break;
+            case WidgetSkinPrefs.TEXT_BLACK:
+                mTextRadioGroup.check(R.id.radio_text_black);
+                break;
+            default:
+                mTextRadioGroup.check(R.id.radio_text_auto);
+                break;
+        }
+    }
+
+    private int getCheckedTextMode() {
+        int checkedId = mTextRadioGroup.getCheckedRadioButtonId();
+        if (checkedId == R.id.radio_text_white) return WidgetSkinPrefs.TEXT_WHITE;
+        if (checkedId == R.id.radio_text_black) return WidgetSkinPrefs.TEXT_BLACK;
+        return WidgetSkinPrefs.TEXT_AUTO;
+    }
+
     private void setAlphaViews() {
         mAlphaValueTextView = findViewById(R.id.text_alpha_value);
         mAlphaSeekBar = findViewById(R.id.seekbar_alpha);
@@ -122,10 +146,12 @@ public class TermuxWidgetConfigureActivity extends AppCompatActivity {
 
     private void saveAndFinish() {
         int colorMode = getCheckedColorMode();
+        int textMode = getCheckedTextMode();
         int percent = mAlphaSeekBar.getProgress();
-        Logger.logDebug(LOG_TAG, "Saving background color mode " + colorMode + " and opacity " + percent + "% for widget id: " + mAppWidgetId);
+        Logger.logDebug(LOG_TAG, "Saving background color mode " + colorMode + " and text color mode " + textMode + " and opacity " + percent + "% for widget id: " + mAppWidgetId);
 
         WidgetSkinPrefs.setColorMode(this, mAppWidgetId, colorMode);
+        WidgetSkinPrefs.setTextMode(this, mAppWidgetId, textMode);
         WidgetSkinPrefs.setAlphaPercent(this, mAppWidgetId, percent);
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         TermuxWidgetProvider.updateAppWidgetRemoteViews(this, appWidgetManager, mAppWidgetId);
