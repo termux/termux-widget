@@ -1,31 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+     Root view is @android:id/background so that its color is used as widget background. Its
+     color and alpha are set from TermuxWidgetProvider. Launchers on Android 12+ clip it with the
+     system widget corner radius and One UI Home 7.0+ blurs the wallpaper behind it, see WidgetSkin.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="0dp" >
+    android:background="@color/widget_bg" >
+
+    <!-- Content layer. Title and refresh button are inset 16dp so that they are not clipped by rounded corners. -->
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="0dp"
-        android:paddingTop="6dp" >
+        android:layout_height="match_parent" >
 
         <LinearLayout
             android:id="@+id/top_row"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FF000000"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="6dp" >
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp" >
 
             <TextView
+                android:id="@+id/widget_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="2.0"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
                 android:text="@string/title_widget"
-                android:textColor="@android:color/primary_text_dark"
-                android:textSize="18sp" />
+                android:textColor="@color/widget_text_primary"
+                android:textSize="16sp" />
+
+            <!-- Icon is 24dp, so with 8dp padding here and 8dp paddingEnd of top_row its edge is 16dp from the end. -->
+
+            <ImageButton
+                android:id="@+id/refresh_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ripple_circle"
+                android:contentDescription="@string/action_refresh"
+                android:padding="8dp"
+                android:src="@drawable/ic_widget_refresh" />
         </LinearLayout>
 
         <ListView
@@ -33,9 +54,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/top_row"
-            android:background="@android:color/background_light"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1px" >
+            android:background="@android:color/transparent"
+            android:clipToPadding="false"
+            android:divider="@color/widget_divider"
+            android:dividerHeight="1px"
+            android:paddingBottom="8dp" >
         </ListView>
 
         <!-- Shown for empty collection due to rv.setEmptyView(R.id.widget_list, R.id.empty_view) being called: -->
@@ -45,20 +68,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/top_row"
-            android:background="@android:color/white"
-            android:padding="6dp"
+            android:background="@android:color/transparent"
+            android:padding="16dp"
             android:text="@string/msg_refresh_widget_from_app"
-            android:textColor="@android:color/black" />
+            android:textColor="@color/widget_text_secondary"
+            android:textSize="14sp" />
     </RelativeLayout>
 
-    <ImageButton
-        android:id="@+id/refresh_button"
-        style="?android:attr/borderlessButtonStyle"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:contentDescription="@string/action_refresh"
-        android:src="@android:drawable/stat_notify_sync" />
-
-</RelativeLayout>
+</FrameLayout>

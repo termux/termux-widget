@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+         Samsung One UI Home widget provider attributes, used in xml/termux_appwidget_info.xml.
+         Undocumented by Samsung; One UI Home 7.0+ applies its wallpaper blur behind widgets that
+         declare widgetStyle and widgetSize. See WidgetSkin.
+    -->
+    <attr name="widgetStyle" format="integer">
+        <flag name="colorful" value="0x1" />
+        <flag name="monotone" value="0x2" />
+    </attr>
+
+    <attr name="widgetSize" format="integer">
+        <flag name="tiny" value="0x1" />
+        <flag name="small" value="0x2" />
+        <flag name="wideSmall" value="0x4" />
+        <flag name="medium" value="0x8" />
+        <flag name="large" value="0x10" />
+        <flag name="extraLarge" value="0x20" />
+        <flag name="extraLargeLong" value="0x40" />
+    </attr>
+</resources>

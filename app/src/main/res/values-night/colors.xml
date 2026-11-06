@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget skin colors (dark) -->
+    <color name="widget_bg">@color/widget_bg_dark</color>
+    <color name="widget_text_primary">@color/widget_text_primary_dark</color>
+    <color name="widget_text_secondary">@color/widget_text_secondary_dark</color>
+</resources>

@@ -57,7 +57,10 @@ public final class TermuxWidgetService extends RemoteViewsService {
         @Override
         public RemoteViews getViewAt(int position) {
             // Position will always range from 0 to getCount() - 1.
-            return shortcutFiles.get(position).getListWidgetView(mContext);
+            RemoteViews remoteViews = shortcutFiles.get(position).getListWidgetView(mContext);
+            WidgetSkin skin = WidgetSkin.get(mContext, mAppWidgetId);
+            WidgetSkin.setColor(mContext, remoteViews, R.id.widget_item, "setTextColor", skin.textPrimaryLight, skin.textPrimaryDark);
+            return remoteViews;
         }
 
         @Override

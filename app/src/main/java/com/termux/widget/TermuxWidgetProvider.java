@@ -32,6 +32,7 @@ import com.termux.shared.termux.TermuxConstants.TERMUX_WIDGET_APP.TERMUX_WIDGET_
 import com.termux.shared.termux.TermuxUtils;
 import com.termux.shared.termux.file.TermuxFileUtils;
 import com.termux.shared.termux.settings.preferences.TermuxWidgetAppSharedPreferences;
+import com.termux.widget.activities.TermuxWidgetConfigureActivity;
 import com.termux.widget.utils.ShortcutUtils;
 
 import java.io.File;
@@ -83,6 +84,14 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
 
+        // Set background color and opacity, and matching text colors. See WidgetSkin for the
+        // One UI Home blur.
+        WidgetSkin skin = WidgetSkin.get(context, appWidgetId);
+        WidgetSkin.setColor(context, remoteViews, android.R.id.background, "setBackgroundColor", skin.backgroundLight, skin.backgroundDark);
+        WidgetSkin.setColor(context, remoteViews, R.id.widget_title, "setTextColor", skin.textPrimaryLight, skin.textPrimaryDark);
+        WidgetSkin.setColor(context, remoteViews, R.id.empty_view, "setTextColor", skin.textSecondaryLight, skin.textSecondaryDark);
+        WidgetSkin.setColor(context, remoteViews, R.id.refresh_button, "setColorFilter", skin.textPrimaryLight, skin.textPrimaryDark);
+
         // The empty view is displayed when the collection has no items. It should be a sibling
         // of the collection view:
         remoteViews.setEmptyView(R.id.widget_list, R.id.empty_view);
@@ -106,6 +115,15 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.refresh_button, refreshPendingIntent);
 
+        // Setup title to open widget settings, in case launcher does not show a reconfigure option:
+        Intent configureIntent = new Intent(context, TermuxWidgetConfigureActivity.class);
+        configureIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        configureIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        configureIntent.setData(Uri.parse(configureIntent.toUri(Intent.URI_INTENT_SCHEME)));
+        PendingIntent configurePendingIntent = PendingIntent.getActivity(context, appWidgetId, configureIntent,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.widget_title, configurePendingIntent);
+
         // Here we setup the a pending intent template. Individuals items of a collection
         // cannot setup their own pending intents, instead, the collection as a whole can
         // setup a pending intent template, and the individual items can set a fillInIntent
@@ -124,7 +142,12 @@ public final class TermuxWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
-        Logger.logDebug(LOG_TAG, "onDeleted");
+        Logger.logDebug(LOG_TAG, "onDeleted: " + Arrays.toString(appWidgetIds));
+        if (appWidgetIds == null) return;
+
+        for (int appWidgetId : appWidgetIds) {
+            WidgetSkinPrefs.remove(context, appWidgetId);
+        }
     }
 
     @Override

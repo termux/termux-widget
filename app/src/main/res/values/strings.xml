@@ -58,6 +58,20 @@
     <string name="msg_refresh_widget_from_app">Open &TERMUX_WIDGET_APP_NAME; app to refresh widget</string>
     <string name="action_refresh_all_widgets">Refresh Widgets</string>
 
+    <!-- TermuxWidgetConfigureActivity -->
+    <string name="title_widget_settings">Widget settings</string>
+    <string name="label_widget_background_opacity">Background opacity: %1$d%%</string>
+    <string name="label_widget_background_color">Background color</string>
+    <string name="label_widget_color_auto">Follow dark mode</string>
+    <string name="label_widget_color_white">White</string>
+    <string name="label_widget_color_black">Black</string>
+    <string name="label_widget_color_wallpaper">Wallpaper color</string>
+    <string name="label_widget_text_color">Text color</string>
+    <string name="label_widget_text_auto">Follow background</string>
+    <string name="label_widget_text_white">White text</string>
+    <string name="label_widget_text_black">Black text</string>
+    <string name="action_save">Save</string>
+
     <!-- ShortcutFile -->
     <string name="msg_shortcut_icon_file_used">Using file at `%1$s` as shortcut icon file</string>
 
